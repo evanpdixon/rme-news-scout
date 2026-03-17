@@ -88,6 +88,8 @@
     .topic-badge.outages { background: #fdebd0; color: #b9770e; }
     .topic-badge.preparedness { background: #d6eaf8; color: #2471a3; }
     .topic-badge.fcc { background: #e8daef; color: #6c3483; }
+    .topic-badge.fcc-enforcement { background: #f5b7b1; color: #78281f; }
+    .topic-badge.rme-mention { background: #f9e79f; color: #7d6608; font-weight: 700; }
     .source-name {
       display: inline-block;
       font-size: 11px;
@@ -105,6 +107,23 @@
       margin-top: 4px;
       line-height: 1.4;
     }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a3a5c;
+      margin: 24px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e8e8ec;
+    }
+    .section-title:first-child {
+      margin-top: 0;
+    }
+    .no-articles {
+      font-size: 13px;
+      color: #aaa;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
     .footer {
       background: #f4f4f7;
       text-align: center;
@@ -121,27 +140,14 @@
       <p>{{ date }} &mdash; {{ total }} article{{ "s" if total != 1 }} today</p>
     </div>
     <div class="body">
-      {% for art in articles %}
+      {% for topic, topic_articles in grouped.items() %}
+      <div class="section-title">{{ topic }}</div>
+      {% if topic_articles %}
+      {% for art in topic_articles %}
       <div class="article score-{{ art.score | default(3) }}">
         <a class="title" href="{{ art.url }}">{{ art.title }}</a>
         <div class="badges">
           <span class="score-badge">{{ art.score | default("?") }}/5</span>
-          {% set topic = art.topic | default("Other") %}
-          {% if topic == "Ham Radio" %}
-          <span class="topic-badge ham-radio">Ham Radio</span>
-          {% elif topic == "GMRS" %}
-          <span class="topic-badge gmrs">GMRS</span>
-          {% elif topic == "Emergency Comms" %}
-          <span class="topic-badge emergency-comms">Emergency Comms</span>
-          {% elif topic == "Outages & Infrastructure" %}
-          <span class="topic-badge outages">Outages</span>
-          {% elif topic == "Preparedness & Off-Grid" %}
-          <span class="topic-badge preparedness">Preparedness</span>
-          {% elif topic == "FCC & Policy" %}
-          <span class="topic-badge fcc">FCC & Policy</span>
-          {% else %}
-          <span class="topic-badge">{{ topic }}</span>
-          {% endif %}
           <span class="source-name">{{ art.source }}</span>
         </div>
         {% if art.published %}
@@ -151,6 +157,10 @@
         <div class="rationale">{{ art.rationale }}</div>
         {% endif %}
       </div>
+      {% endfor %}
+      {% else %}
+      <div class="no-articles">No articles found</div>
+      {% endif %}
       {% endfor %}
     </div>
     <div class="footer">

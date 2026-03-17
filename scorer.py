@@ -15,22 +15,29 @@ BATCH_SIZE = 10
 SCORING_PROMPT = """\
 You are a relevance scorer for Radio Made Easy (RME), a company focused on
 ham radio, GMRS, emergency communications, off-grid preparedness, and
-infrastructure resilience.
+infrastructure resilience. RME's website is radiomadeeasy.com.
 
 For each article below, rate its relevance from 1 to 5:
-  5 = Directly about ham radio, GMRS, emergency comms, or RME's core audience
-  4 = Strongly related (power grid failures, major outages, FCC policy, preparedness)
+  5 = Directly mentions Radio Made Easy / RadioMadeEasy / radiomadeeasy.com,
+      OR is directly about ham radio, GMRS, emergency comms, or RME's core audience
+  4 = Strongly related (power grid failures, major outages, FCC enforcement actions,
+      FCC policy changes, preparedness)
   3 = Moderately related (natural disasters, infrastructure news, survival gear)
   2 = Loosely related (general tech, tangentially relevant)
   1 = Not relevant to RME's audience
 
+IMPORTANT: Any article that mentions "Radio Made Easy" or "RadioMadeEasy" by name
+should ALWAYS score 5, regardless of other content.
+
 Also assign each article to ONE topic category:
+  - RME Mention (any direct mention of Radio Made Easy / RadioMadeEasy)
   - Ham Radio
   - GMRS
   - Emergency Comms
   - Outages & Infrastructure
   - Preparedness & Off-Grid
   - FCC & Policy
+  - FCC Enforcement
   - Other
 
 Respond with ONLY a JSON array. No markdown fences, no explanation.

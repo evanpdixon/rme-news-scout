@@ -4,6 +4,7 @@ Scrapers package — aggregates all source scrapers.
 
 from scrapers.rss_scraper import scrape_rss_feeds
 from scrapers.web_scraper import scrape_web_sources
+from scrapers.youtube_scraper import scrape_youtube_searches
 
 
 def run_all_scrapers(config: dict) -> list[dict]:
@@ -19,6 +20,11 @@ def run_all_scrapers(config: dict) -> list[dict]:
     web_sources = config.get("web_sources", [])
     if web_sources:
         articles.extend(scrape_web_sources(web_sources))
+
+    # YouTube searches
+    youtube_searches = config.get("youtube_searches", [])
+    if youtube_searches:
+        articles.extend(scrape_youtube_searches(youtube_searches))
 
     print(f"\n  Total articles collected: {len(articles)}")
     return articles

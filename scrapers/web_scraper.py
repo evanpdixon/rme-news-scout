@@ -27,7 +27,8 @@ def scrape_web_sources(sources: list[dict]) -> list[dict]:
         url = source["url"]
 
         try:
-            resp = httpx.get(url, headers=HEADERS, timeout=20, follow_redirects=True)
+            timeout = 60 if "fcc.gov" in url else 20
+            resp = httpx.get(url, headers=HEADERS, timeout=timeout, follow_redirects=True)
             resp.raise_for_status()
         except Exception as e:
             print(f"  [Web] Error fetching {name}: {e}")
@@ -39,6 +40,8 @@ def scrape_web_sources(sources: list[dict]) -> list[dict]:
             articles.extend(_parse_arrl(soup, name))
         elif "downdetector" in url:
             articles.extend(_parse_downdetector(soup, name))
+        elif "fcc.gov" in url and "enforcement" in url:
+            articles.extend(_parse_fcc_enforcement(soup, name))
         else:
             print(f"  [Web] No parser defined for {name}, skipping")
 
@@ -66,6 +69,53 @@ def _parse_arrl(soup: BeautifulSoup, source_name: str) -> list[dict]:
             "summary": "",
             "published": "",
         })
+
+    return articles
+
+
+def _parse_fcc_enforcement(soup: BeautifulSoup, source_name: str) -> list[dict]:
+    """Extract enforcement actions from the FCC enforcement bureau page."""
+    articles = []
+
+    # FCC enforcement pages use various structures — try multiple selectors
+    # Look for links containing enforcement-related paths
+    selectors = [
+        "a[href*='/document/']",
+        "a[href*='/enforcement/']",
+        ".views-row a",
+        ".view-content a",
+        "td a[href]",
+    ]
+
+    seen_hrefs = set()
+    for selector in selectors:
+        for link in soup.select(selector):
+            title = link.get_text(strip=True)
+            href = link.get("href", "")
+
+            if not title or not href or len(title) < 10:
+                continue
+            if href in seen_hrefs:
+                continue
+            seen_hrefs.add(href)
+
+            if not href.startswith("http"):
+                href = f"https://www.fcc.gov{href}"
+
+            # Skip navigation/menu links
+            if any(skip in href.lower() for skip in [
+                "/about", "/consumers", "/login", "/search", "#",
+                "javascript:", "/rss", "/tags/"
+            ]):
+                continue
+
+            articles.append({
+                "title": title,
+                "url": href,
+                "source": source_name,
+                "summary": "FCC Enforcement Bureau action",
+                "published": "",
+            })
 
     return articles
 
