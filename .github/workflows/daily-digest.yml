@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 jobs:
   digest:
@@ -27,10 +28,38 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python main.py
 
-      - name: Commit updated seen_urls.json
+      - name: Deploy report to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Save files we need before switching branches
+          cp output/*.html /tmp/ 2>/dev/null || true
+          cp seen_urls.json /tmp/seen_urls.json
+
+          # Update seen_urls on master first
           git add seen_urls.json
           git diff --cached --quiet || git commit -m "Update seen_urls.json [skip ci]"
           git push
+
+          # Now deploy HTML to gh-pages
+          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
+            git fetch origin gh-pages
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf .
+          fi
+
+          # Copy reports into gh-pages root
+          cp /tmp/*.html . 2>/dev/null || true
+
+          # Create/update latest.html as a copy of today's report
+          LATEST=$(ls -t *_digest.html 2>/dev/null | head -1)
+          if [ -n "$LATEST" ]; then
+            cp "$LATEST" latest.html
+          fi
+
+          git add *.html 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Update digest $(date +%Y-%m-%d)"
+          git push origin gh-pages

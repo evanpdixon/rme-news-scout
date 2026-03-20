@@ -1,11 +1,9 @@
 """
 Push Notification via ntfy.sh
-Uploads the HTML report and sends a notification with a "View Report"
-button that opens it directly in the phone's browser.
-No account or API key needed.
+Sends a notification with a "View Report" button linking to the
+GitHub Pages hosted report.
 """
 
-import json
 import os
 import httpx
 
@@ -15,15 +13,17 @@ def send_notification(
     title: str,
     message: str,
     html_path: str = "",
+    report_url: str = "",
     server: str = "https://ntfy.sh",
 ) -> bool:
-    """Upload the HTML report to ntfy, then send a notification with a link.
+    """Send a push notification with an optional link to the hosted report.
 
     Args:
         topic: The ntfy topic to publish to (e.g. 'rme-news-scout').
         title: Notification title.
         message: Notification body text.
-        html_path: Path to the HTML report file to upload.
+        html_path: Unused, kept for backward compatibility.
+        report_url: URL to the hosted HTML report.
         server: ntfy server URL (default: public ntfy.sh).
 
     Returns:
@@ -32,28 +32,6 @@ def send_notification(
     url = f"{server}/{topic}"
 
     try:
-        report_url = ""
-
-        # Step 1: Upload the HTML file to get a hosted URL
-        if html_path and os.path.exists(html_path):
-            filename = os.path.basename(html_path)
-            with open(html_path, "rb") as f:
-                upload_resp = httpx.put(
-                    url,
-                    content=f.read(),
-                    headers={
-                        "Title": "Report uploaded",
-                        "Filename": filename,
-                        "Message": "Uploading report...",
-                        "Priority": "1",  # min priority so this doesn't buzz
-                    },
-                    timeout=30,
-                )
-            upload_resp.raise_for_status()
-            data = json.loads(upload_resp.text)
-            report_url = data.get("attachment", {}).get("url", "")
-
-        # Step 2: Send the actual notification with a View Report button
         headers = {
             "Title": title,
             "Tags": "newspaper,radio",

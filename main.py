@@ -88,7 +88,7 @@ def main():
     save_seen_urls(seen_file, seen)
     print(f"\n  Updated {seen_file} ({len(seen)} URLs tracked)")
 
-    # 9. Send push notification via ntfy (with HTML report attached)
+    # 9. Send push notification via ntfy with link to hosted report
     ntfy_cfg = config.get("ntfy")
     if ntfy_cfg and ntfy_cfg.get("topic"):
         top_articles = sorted(filtered, key=lambda a: a.get("score", 0), reverse=True)[:5]
@@ -98,11 +98,17 @@ def main():
         if len(filtered) > 5:
             body_lines.append(f"  ... and {len(filtered) - 5} more")
 
+        # Build report URL: GitHub Pages in CI, empty locally
+        report_url = ""
+        pages_base = config.get("settings", {}).get("pages_base_url", "")
+        if pages_base and html_path:
+            report_url = f"{pages_base}/{os.path.basename(html_path)}"
+
         send_notification(
             topic=ntfy_cfg["topic"],
             title=f"RME News Scout -- {len(filtered)} articles",
             message="\n".join(body_lines),
-            html_path=html_path,
+            report_url=report_url,
             server=ntfy_cfg.get("server", "https://ntfy.sh"),
         )
 

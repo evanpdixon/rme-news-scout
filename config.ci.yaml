@@ -1,5 +1,6 @@
 settings:
   output_dir: "output"
+  pages_base_url: "https://evanpdixon.github.io/rme-news-scout"
   min_relevance_score: 3
   max_articles_per_source: 30
   scheduled_time: "06:00"
