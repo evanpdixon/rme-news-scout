@@ -1,8 +1,7 @@
 """
 Relevance Scorer
-Sends articles to Claude CLI in batches and gets 1–5 relevance scores
-for a ham radio / emergency-preparedness audience.
-Uses `claude -p` (Claude Code CLI) — works with Claude Max, no API key needed.
+Scores articles for relevance using the Anthropic API (Haiku) when available,
+falling back to Claude CLI for local runs.
 """
 
 import json
@@ -48,7 +47,24 @@ Articles to score:
 {articles}"""
 
 
-def _call_claude(prompt: str) -> str:
+def _has_api_key() -> bool:
+    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+
+
+def _call_api(prompt: str) -> str:
+    """Call the Anthropic API directly using the anthropic SDK."""
+    import anthropic
+
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=2048,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return message.content[0].text.strip()
+
+
+def _call_claude_cli(prompt: str) -> str:
     """Call the Claude CLI with a prompt and return the response text."""
     claude_path = shutil.which("claude")
     if not claude_path:
@@ -57,7 +73,6 @@ def _call_claude(prompt: str) -> str:
             "Install it or add it to PATH: https://docs.anthropic.com/en/docs/claude-code"
         )
 
-    # Unset CLAUDECODE env var to allow running from within a Claude Code session
     env = {**os.environ}
     env.pop("CLAUDECODE", None)
 
@@ -75,18 +90,24 @@ def _call_claude(prompt: str) -> str:
     return result.stdout.strip()
 
 
+def _call_llm(prompt: str) -> str:
+    """Use API if ANTHROPIC_API_KEY is set, otherwise fall back to Claude CLI."""
+    if _has_api_key():
+        return _call_api(prompt)
+    return _call_claude_cli(prompt)
+
+
 def score_articles(articles: list[dict], config: dict) -> list[dict]:
-    """Score each article for relevance using Claude CLI.
+    """Score each article for relevance.
 
-    Args:
-        articles: List of article dicts (must have 'title' and 'summary').
-        config: Config dict (unused with CLI mode, kept for interface compat).
-
-    Returns:
-        The same articles, each annotated with 'score' and 'rationale'.
+    Uses the Anthropic API (Haiku) when ANTHROPIC_API_KEY is set,
+    otherwise falls back to Claude CLI.
     """
     if not articles:
         return articles
+
+    mode = "API (Haiku)" if _has_api_key() else "CLI"
+    print(f"  [Scorer] Using {mode}")
 
     scored = []
 
@@ -104,7 +125,7 @@ def score_articles(articles: list[dict], config: dict) -> list[dict]:
         prompt = SCORING_PROMPT.format(articles=articles_text)
 
         try:
-            text = _call_claude(prompt)
+            text = _call_llm(prompt)
 
             # Extract JSON if wrapped in markdown code blocks
             if text.startswith("```"):
@@ -122,7 +143,6 @@ def score_articles(articles: list[dict], config: dict) -> list[dict]:
 
         except Exception as e:
             print(f"  [Scorer] Error scoring batch starting at {batch_start}: {e}")
-            # Default unscored articles to 3 so they aren't silently dropped
             for art in batch:
                 art["score"] = 3
                 art["topic"] = "Other"

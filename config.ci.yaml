@@ -1,0 +1,50 @@
+settings:
+  output_dir: "output"
+  min_relevance_score: 3
+  max_articles_per_source: 30
+  scheduled_time: "06:00"
+  seen_urls_file: seen_urls.json
+
+ntfy:
+  topic: rme-news-scout
+  server: "https://ntfy.sh"
+
+rss_feeds:
+  - name: "Google News - Ham Radio"
+    url: "https://news.google.com/rss/search?q=ham+radio&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Amateur Radio"
+    url: "https://news.google.com/rss/search?q=amateur+radio&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Cell Outage"
+    url: "https://news.google.com/rss/search?q=cellular+outage&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Internet Outage"
+    url: "https://news.google.com/rss/search?q=internet+outage&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Power Grid"
+    url: "https://news.google.com/rss/search?q=power+grid+failure&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Emergency Comms"
+    url: "https://news.google.com/rss/search?q=emergency+communications&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - GMRS"
+    url: "https://news.google.com/rss/search?q=GMRS+radio&hl=en-US&gl=US&ceid=US:en"
+  - name: "ARRL News"
+    url: "http://www.arrl.org/news/rss"
+  - name: "The Prepared"
+    url: "https://theprepared.com/feed/"
+  - name: "Google News - FCC Enforcement"
+    url: "https://news.google.com/rss/search?q=FCC+enforcement+action&hl=en-US&gl=US&ceid=US:en"
+  - name: "Comm Law Center - FCC Enforcement"
+    url: "https://www.commlawcenter.com/category/fcc-enforcement/feed"
+  - name: "Broadcast Law Blog"
+    url: "https://www.broadcastlawblog.com/feed"
+  - name: "Federal Register - FCC"
+    url: "https://www.federalregister.gov/api/v1/documents.rss?conditions%5Bagencies%5D%5B%5D=federal-communications-commission&conditions%5Btype%5D%5B%5D=NOTICE&conditions%5Btype%5D%5B%5D=RULE"
+  - name: "Google News - Radio Made Easy"
+    url: "https://news.google.com/rss/search?q=%22Radio+Made+Easy%22+OR+%22RadioMadeEasy%22+OR+radiomadeeasy.com&hl=en-US&gl=US&ceid=US:en"
+  - name: "Google News - Radio Made Easy YouTube"
+    url: "https://news.google.com/rss/search?q=%22Radio+Made+Easy%22+site%3Ayoutube.com&hl=en-US&gl=US&ceid=US:en"
+
+youtube_searches:
+  - query: "Radio Made Easy"
+  - query: "RadioMadeEasy"
+
+web_sources:
+  - name: "ARRL News"
+    url: "https://www.arrl.org/news"

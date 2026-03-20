@@ -16,16 +16,21 @@ from digest import generate_markdown, generate_html_report
 from notifier import send_notification
 
 
-def load_config(path: str = "config.yaml") -> dict:
-    """Load and return the YAML configuration."""
+def load_config() -> dict:
+    """Load and return the YAML configuration.
+    Uses config.ci.yaml in CI, config.yaml locally."""
+    path = "config.ci.yaml" if os.environ.get("CI") else "config.yaml"
     if not os.path.exists(path):
-        print(f"ERROR: {path} not found. Run setup.py first.")
+        print(f"ERROR: {path} not found.")
         sys.exit(1)
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
 
 def main():
+    # Ensure working directory is the script's directory (critical for Task Scheduler)
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
     start = datetime.now()
     print(f"\n{'=' * 50}")
     print(f"  RME News Scout -- {start.strftime('%Y-%m-%d %H:%M')}")
@@ -35,6 +40,9 @@ def main():
     config = load_config()
     settings = config.get("settings", {})
     output_dir = settings.get("output_dir", "output")
+    # In CI, always use local output directory
+    if os.environ.get("CI"):
+        output_dir = "output"
     min_score = settings.get("min_relevance_score", 3)
     seen_file = settings.get("seen_urls_file", "seen_urls.json")
 

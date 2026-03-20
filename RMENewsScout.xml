@@ -3,6 +3,13 @@
   <RegistrationInfo>
     <Description>RME News Scout - Daily news digest scraper</Description>
   </RegistrationInfo>
+  <Principals>
+    <Principal id="Author">
+      <UserId>evanp</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
   <Triggers>
     <CalendarTrigger>
       <StartBoundary>2026-03-17T06:00:00</StartBoundary>
@@ -27,7 +34,7 @@
   </Settings>
   <Actions>
     <Exec>
-      <Command>python</Command>
+      <Command>C:\Python310\python.exe</Command>
       <Arguments>C:\Claude\rme-news-scout\main.py</Arguments>
       <WorkingDirectory>C:\Claude\rme-news-scout</WorkingDirectory>
     </Exec>
