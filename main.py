@@ -13,6 +13,7 @@ from scrapers import run_all_scrapers
 from dedup import load_seen_urls, save_seen_urls, deduplicate
 from scorer import score_articles, filter_by_score
 from digest import generate_markdown, generate_html_report, generate_index
+from metadata import enrich_articles
 from notifier import send_notification
 
 
@@ -78,6 +79,10 @@ def main():
         print("\n  No articles met the relevance threshold. Exiting.")
         save_seen_urls(seen_file, seen)
         return
+
+    # 6b. Enrich with metadata (og:image, author) for story card generation
+    print("\n--- Metadata Enrichment ---")
+    enrich_articles(filtered)
 
     # 7. Generate reports
     print("\n--- Generating Reports ---")

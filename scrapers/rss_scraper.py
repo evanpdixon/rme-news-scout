@@ -84,12 +84,20 @@ def scrape_rss_feeds(feeds: list[dict]) -> list[dict]:
             if summary:
                 summary = unescape(re.sub(r"<[^>]+>", "", summary)).strip()
 
+            # Extract author if available in feed
+            author = ""
+            if hasattr(entry, "author"):
+                author = entry.author
+            elif hasattr(entry, "authors") and entry.authors:
+                author = entry.authors[0].get("name", "")
+
             articles.append({
                 "title": entry.get("title", "(no title)"),
                 "url": entry.get("link", ""),
                 "source": name,
                 "summary": summary[:500] if summary else "",
                 "published": pub_date.strftime("%b %d, %I:%M %p") if pub_date else "",
+                "author": author,
             })
 
     print(f"  [RSS] Collected {len(articles)} recent articles from {len(feeds)} feeds ({skipped_old} older than {MAX_AGE_HOURS}h skipped)")

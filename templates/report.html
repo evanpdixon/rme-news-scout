@@ -34,6 +34,20 @@
       font-size: 14px;
       opacity: 0.85;
     }
+    .header-nav {
+      margin-top: 10px;
+    }
+    .header-nav a {
+      color: #fff;
+      opacity: 0.8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .header-nav a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
     .body {
       padding: 20px 28px;
     }
@@ -43,6 +57,7 @@
       border-left: 4px solid #ddd;
       background: #fafafa;
       border-radius: 0 4px 4px 0;
+      position: relative;
     }
     .article.score-5 { border-left-color: #2ecc71; }
     .article.score-4 { border-left-color: #27ae60; }
@@ -131,6 +146,114 @@
       font-size: 12px;
       color: #999;
     }
+
+    /* Share button */
+    .share-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #1a3a5c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .article:hover .share-btn {
+      opacity: 1;
+    }
+    .share-btn:hover {
+      background: #244d73;
+    }
+
+    /* Story card modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 420px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+      line-height: 1;
+    }
+    .modal h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: #1a3a5c;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-download {
+      background: #1a3a5c;
+      color: #fff;
+    }
+    .btn-download:hover {
+      background: #244d73;
+    }
+    .btn-cancel {
+      background: #e8e8ec;
+      color: #333;
+    }
+
+    /* Story card preview (scaled down in modal) */
+    .story-preview-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .story-preview-wrapper canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Hidden rendering container (full size, off-screen) */
+    #story-render {
+      position: fixed;
+      left: -9999px;
+      top: 0;
+    }
   </style>
 </head>
 <body>
@@ -138,17 +261,33 @@
     <div class="header">
       <h1>RME News Scout</h1>
       <p>{{ date }} &mdash; {{ total }} article{{ "s" if total != 1 }} today</p>
+      <div class="header-nav">
+        <a href="index.html">&#9664; All Reports</a>
+      </div>
     </div>
     <div class="body">
+      {% set article_index = namespace(n=0) %}
       {% for topic, topic_articles in grouped.items() %}
       <div class="section-title">{{ topic }}</div>
       {% if topic_articles %}
       {% for art in topic_articles %}
-      <div class="article score-{{ art.score | default(3) }}">
+      <div class="article score-{{ art.score | default(3) }}"
+           id="article-{{ article_index.n }}"
+           data-title="{{ art.title }}"
+           data-source="{{ art.source }}"
+           data-author="{{ art.author | default('') }}"
+           data-published="{{ art.published | default('') }}"
+           data-summary="{{ art.summary | default('') }}"
+           data-image="{{ art.image_url | default('') }}"
+           data-topic="{{ art.topic | default('Other') }}"
+           data-score="{{ art.score | default(3) }}"
+           data-url="{{ art.url }}">
         <a class="title" href="{{ art.url }}">{{ art.title }}</a>
+        <button class="share-btn" onclick="openStoryModal({{ article_index.n }})">IG Story</button>
         <div class="badges">
           <span class="score-badge">{{ art.score | default("?") }}/5</span>
           <span class="source-name">{{ art.source }}</span>
+          {% if art.author %}<span class="source-name">&mdash; {{ art.author }}</span>{% endif %}
         </div>
         {% if art.published %}
         <div class="article-date">{{ art.published }}</div>
@@ -157,6 +296,7 @@
         <div class="rationale">{{ art.rationale }}</div>
         {% endif %}
       </div>
+      {% set article_index.n = article_index.n + 1 %}
       {% endfor %}
       {% else %}
       <div class="no-articles">No articles found</div>
@@ -168,5 +308,286 @@
       Radio Made Easy &bull; Daily News Digest &bull; Powered by Claude AI
     </div>
   </div>
+
+  <!-- Story card modal -->
+  <div class="modal-overlay" id="storyModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeStoryModal()">&times;</button>
+      <h3>Instagram Story Image</h3>
+      <div class="story-preview-wrapper">
+        <canvas id="storyCanvas"></canvas>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeStoryModal()">Cancel</button>
+        <button class="btn-download" id="downloadBtn" onclick="downloadStory()">Download PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Instagram Story dimensions: 1080 x 1920 (9:16 portrait)
+    const STORY_W = 1080;
+    const STORY_H = 1920;
+    let currentArticleId = null;
+
+    function openStoryModal(idx) {
+      const el = document.getElementById('article-' + idx);
+      if (!el) return;
+      currentArticleId = idx;
+
+      const data = {
+        title: el.dataset.title,
+        source: el.dataset.source,
+        author: el.dataset.author,
+        published: el.dataset.published,
+        summary: el.dataset.summary,
+        image: el.dataset.image,
+        topic: el.dataset.topic,
+        score: el.dataset.score,
+        url: el.dataset.url
+      };
+
+      document.getElementById('storyModal').classList.add('active');
+      renderStoryCard(data);
+    }
+
+    function closeStoryModal() {
+      document.getElementById('storyModal').classList.remove('active');
+    }
+
+    function downloadStory() {
+      const canvas = document.getElementById('storyCanvas');
+      const link = document.createElement('a');
+      const el = document.getElementById('article-' + currentArticleId);
+      const slug = (el?.dataset.title || 'story').replace(/[^a-zA-Z0-9]+/g, '-').substring(0, 50).toLowerCase();
+      link.download = 'rme-story-' + slug + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('storyModal').addEventListener('click', function(e) {
+      if (e.target === this) closeStoryModal();
+    });
+
+    // Color map for topic categories
+    const TOPIC_COLORS = {
+      'RME Mention':             { bg: '#f9e79f', fg: '#7d6608' },
+      'Ham Radio':               { bg: '#d5f5e3', fg: '#1e8449' },
+      'GMRS':                    { bg: '#d4efdf', fg: '#1e8449' },
+      'Emergency Comms':         { bg: '#fadbd8', fg: '#922b21' },
+      'Outages & Infrastructure':{ bg: '#fdebd0', fg: '#b9770e' },
+      'Preparedness & Off-Grid': { bg: '#d6eaf8', fg: '#2471a3' },
+      'FCC & Policy':            { bg: '#e8daef', fg: '#6c3483' },
+      'FCC Enforcement':         { bg: '#f5b7b1', fg: '#78281f' },
+      'Other':                   { bg: '#e8e8ec', fg: '#555'    }
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      // Returns the Y position after the last line
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, currentY);
+      return currentY + lineHeight;
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function renderStoryCard(data) {
+      const canvas = document.getElementById('storyCanvas');
+      canvas.width = STORY_W;
+      canvas.height = STORY_H;
+      const ctx = canvas.getContext('2d');
+      const pad = 72;
+
+      // Background gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
+      grad.addColorStop(0, '#0f2640');
+      grad.addColorStop(0.6, '#1a3a5c');
+      grad.addColorStop(1, '#0f2640');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // Subtle grid pattern overlay
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < STORY_W; i += 40) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, STORY_H); ctx.stroke();
+      }
+      for (let i = 0; i < STORY_H; i += 40) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(STORY_W, i); ctx.stroke();
+      }
+
+      let curY = pad;
+
+      // ── RME branding at top ──
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('RME NEWS SCOUT', pad, curY + 28);
+      curY += 36;
+
+      // Date line
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('{{ date }}', pad, curY + 24);
+      curY += 50;
+
+      // Divider
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, curY);
+      ctx.lineTo(STORY_W - pad, curY);
+      ctx.stroke();
+      curY += 40;
+
+      // ── Topic badge ──
+      const topicColors = TOPIC_COLORS[data.topic] || TOPIC_COLORS['Other'];
+      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const topicText = data.topic.toUpperCase();
+      const topicMetrics = ctx.measureText(topicText);
+      const badgeW = topicMetrics.width + 28;
+      const badgeH = 36;
+
+      drawRoundedRect(ctx, pad, curY, badgeW, badgeH, 6);
+      ctx.fillStyle = topicColors.bg;
+      ctx.fill();
+      ctx.fillStyle = topicColors.fg;
+      ctx.fillText(topicText, pad + 14, curY + 26);
+      curY += badgeH + 30;
+
+      // ── Featured image (if available) ──
+      const imageArea = 420;
+      let imageLoaded = false;
+
+      function drawRestOfCard() {
+        // ── Headline ──
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        curY = wrapText(ctx, data.title, pad, curY, STORY_W - pad * 2, 60);
+        curY += 16;
+
+        // ── Source / Author / Date line ──
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        let metaLine = data.source;
+        if (data.author) metaLine += ' — ' + data.author;
+        if (data.published) metaLine += ' · ' + data.published;
+        curY = wrapText(ctx, metaLine, pad, curY, STORY_W - pad * 2, 34);
+        curY += 24;
+
+        // ── Divider ──
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, curY);
+        ctx.lineTo(STORY_W - pad, curY);
+        ctx.stroke();
+        curY += 28;
+
+        // ── Summary text ──
+        if (data.summary) {
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.font = '30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          // Truncate summary to fit remaining space
+          const maxSummaryY = STORY_H - 160;
+          const availableLines = Math.floor((maxSummaryY - curY) / 42);
+          const words = data.summary.split(' ');
+          let truncated = '';
+          let testLine = '';
+          let lines = 0;
+          for (let i = 0; i < words.length; i++) {
+            testLine = truncated + (truncated ? ' ' : '') + words[i];
+            const w = ctx.measureText(testLine).width;
+            if (w > STORY_W - pad * 2) {
+              lines++;
+              if (lines >= availableLines) {
+                truncated += '...';
+                break;
+              }
+              truncated += '\n' + words[i];
+            } else {
+              truncated = testLine;
+            }
+          }
+          curY = wrapText(ctx, truncated.replace(/\n/g, ' '), pad, curY, STORY_W - pad * 2, 42);
+        }
+
+        // ── Bottom branding bar ──
+        const barH = 80;
+        const barY = STORY_H - barH;
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(0, barY, STORY_W, barH);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('radiomadeeasy.com', STORY_W / 2, barY + 48);
+        ctx.textAlign = 'left';
+      }
+
+      // Try to load the featured image
+      if (data.image) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          // Draw image with rounded corners and cover-fit
+          const imgW = STORY_W - pad * 2;
+          const imgH = imageArea;
+          const scale = Math.max(imgW / img.width, imgH / img.height);
+          const sw = imgW / scale;
+          const sh = imgH / scale;
+          const sx = (img.width - sw) / 2;
+          const sy = (img.height - sh) / 2;
+
+          ctx.save();
+          drawRoundedRect(ctx, pad, curY, imgW, imgH, 12);
+          ctx.clip();
+          ctx.drawImage(img, sx, sy, sw, sh, pad, curY, imgW, imgH);
+          // Dark overlay at bottom of image for readability
+          const imgGrad = ctx.createLinearGradient(0, curY + imgH - 100, 0, curY + imgH);
+          imgGrad.addColorStop(0, 'rgba(0,0,0,0)');
+          imgGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
+          ctx.fillStyle = imgGrad;
+          ctx.fillRect(pad, curY, imgW, imgH);
+          ctx.restore();
+
+          curY += imgH + 32;
+          drawRestOfCard();
+        };
+        img.onerror = function() {
+          // No image — just draw the rest
+          drawRestOfCard();
+        };
+        img.src = data.image;
+      } else {
+        drawRestOfCard();
+      }
+    }
+  </script>
 </body>
 </html>
