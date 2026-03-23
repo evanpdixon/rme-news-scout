@@ -4,164 +4,186 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RME News Scout -- {{ date }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --rme-accent: #fdd351;
+      --rme-accent-hover: #ffe066;
+      --rme-accent-dim: rgba(253, 211, 81, 0.15);
+      --rme-bg: #0a0a0a;
+      --rme-bg-card: #141414;
+      --rme-bg-elevated: #1c1c1c;
+      --rme-text: #e8e8e8;
+      --rme-text-secondary: #a0a0a0;
+      --rme-text-heading: #fdd351;
+      --rme-border: #2a2a2a;
+      --rme-border-accent: rgba(253, 211, 81, 0.22);
+      --rme-radius: 10px;
+      --rme-radius-sm: 6px;
+      --rme-font-heading: 'Barlow Semi Condensed', 'Barlow', sans-serif;
+      --rme-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f4f4f7;
-      color: #333;
+      font-family: var(--rme-font-body);
+      background: var(--rme-bg);
+      color: var(--rme-text);
       margin: 0;
       padding: 0;
     }
     .container {
       max-width: 640px;
       margin: 20px auto;
-      background: #fff;
-      border-radius: 8px;
+      background: var(--rme-bg-card);
+      border-radius: var(--rme-radius);
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      border: 1px solid var(--rme-border);
     }
     .header {
-      background: #1a3a5c;
-      color: #fff;
+      background: var(--rme-bg-elevated);
       padding: 24px 28px;
+      border-bottom: 1px solid var(--rme-border);
     }
     .header h1 {
       margin: 0 0 4px 0;
-      font-size: 22px;
+      font-family: var(--rme-font-heading);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--rme-text-heading);
+      letter-spacing: 0.5px;
     }
     .header p {
       margin: 0;
       font-size: 14px;
-      opacity: 0.85;
+      color: var(--rme-text-secondary);
     }
     .header-nav {
       margin-top: 10px;
     }
     .header-nav a {
-      color: #fff;
-      opacity: 0.8;
+      color: var(--rme-accent);
       text-decoration: none;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
     }
     .header-nav a:hover {
-      opacity: 1;
+      color: var(--rme-accent-hover);
       text-decoration: underline;
     }
     .body {
       padding: 20px 28px;
     }
     .article {
-      margin-bottom: 16px;
-      padding: 10px 12px;
-      border-left: 4px solid #ddd;
-      background: #fafafa;
-      border-radius: 0 4px 4px 0;
-      position: relative;
+      margin-bottom: 14px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--rme-border);
+      background: var(--rme-bg-elevated);
+      border-radius: 0 var(--rme-radius-sm) var(--rme-radius-sm) 0;
     }
-    .article.score-5 { border-left-color: #2ecc71; }
-    .article.score-4 { border-left-color: #27ae60; }
-    .article.score-3 { border-left-color: #f39c12; }
+    .article.score-5 { border-left-color: #4dff88; }
+    .article.score-4 { border-left-color: #2ecc71; }
+    .article.score-3 { border-left-color: var(--rme-accent); }
     .article.score-2 { border-left-color: #e67e22; }
-    .article.score-1 { border-left-color: #ccc; }
+    .article.score-1 { border-left-color: #555; }
     .article a.title {
-      color: #1a3a5c;
+      color: var(--rme-text-heading);
       text-decoration: none;
+      font-family: var(--rme-font-heading);
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.3;
     }
     .article a.title:hover {
+      color: var(--rme-accent-hover);
       text-decoration: underline;
     }
     .badges {
-      margin-top: 5px;
+      margin-top: 6px;
     }
     .score-badge {
       display: inline-block;
       font-size: 11px;
-      font-weight: 600;
-      color: #fff;
-      background: #1a3a5c;
+      font-weight: 700;
+      color: var(--rme-bg);
+      background: var(--rme-accent);
       border-radius: 3px;
-      padding: 2px 6px;
-      margin-right: 5px;
+      padding: 2px 7px;
+      margin-right: 6px;
     }
-    .topic-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 500;
-      color: #555;
-      background: #e8e8ec;
-      border-radius: 3px;
-      padding: 2px 6px;
-      margin-right: 5px;
-    }
-    .topic-badge.ham-radio { background: #d5f5e3; color: #1e8449; }
-    .topic-badge.gmrs { background: #d4efdf; color: #1e8449; }
-    .topic-badge.emergency-comms { background: #fadbd8; color: #922b21; }
-    .topic-badge.outages { background: #fdebd0; color: #b9770e; }
-    .topic-badge.preparedness { background: #d6eaf8; color: #2471a3; }
-    .topic-badge.fcc { background: #e8daef; color: #6c3483; }
-    .topic-badge.fcc-enforcement { background: #f5b7b1; color: #78281f; }
-    .topic-badge.rme-mention { background: #f9e79f; color: #7d6608; font-weight: 700; }
     .source-name {
       display: inline-block;
       font-size: 11px;
-      color: #999;
+      color: var(--rme-text-secondary);
       margin-right: 5px;
     }
     .article-date {
       font-size: 11px;
-      color: #aaa;
-      margin-top: 3px;
+      color: var(--rme-text-secondary);
+      margin-top: 4px;
+      opacity: 0.7;
     }
     .rationale {
       font-size: 13px;
-      color: #666;
-      margin-top: 4px;
+      color: var(--rme-text-secondary);
+      margin-top: 6px;
       line-height: 1.4;
     }
     .section-title {
-      font-size: 16px;
+      font-family: var(--rme-font-heading);
+      font-size: 17px;
       font-weight: 700;
-      color: #1a3a5c;
-      margin: 24px 0 10px 0;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #e8e8ec;
+      color: var(--rme-text-heading);
+      margin: 28px 0 12px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--rme-border-accent);
+      letter-spacing: 0.3px;
     }
     .section-title:first-child {
       margin-top: 0;
     }
     .no-articles {
       font-size: 13px;
-      color: #aaa;
+      color: var(--rme-text-secondary);
       font-style: italic;
       margin-bottom: 16px;
     }
     .footer {
-      background: #f4f4f7;
+      background: var(--rme-bg-elevated);
       text-align: center;
-      padding: 16px;
+      padding: 18px;
       font-size: 12px;
-      color: #999;
+      color: var(--rme-text-secondary);
+      border-top: 1px solid var(--rme-border);
+    }
+    .footer a {
+      color: var(--rme-accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer a:hover {
+      color: var(--rme-accent-hover);
     }
 
     /* Share button */
     .share-btn {
       display: inline-block;
-      background: #1a3a5c;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 10px;
+      background: var(--rme-accent-dim);
+      color: var(--rme-accent);
+      border: 1px solid var(--rme-border-accent);
+      border-radius: var(--rme-radius-sm);
+      padding: 5px 12px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 6px;
+      margin-top: 8px;
+      font-family: var(--rme-font-body);
+      transition: background 0.15s, color 0.15s;
     }
     .share-btn:hover {
-      background: #244d73;
+      background: var(--rme-accent);
+      color: var(--rme-bg);
     }
 
     /* Story card modal */
@@ -169,7 +191,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.85);
       z-index: 1000;
       justify-content: center;
       align-items: center;
@@ -178,8 +200,9 @@
       display: flex;
     }
     .modal {
-      background: #fff;
-      border-radius: 12px;
+      background: var(--rme-bg-card);
+      border: 1px solid var(--rme-border);
+      border-radius: var(--rme-radius);
       padding: 20px;
       max-width: 420px;
       width: 90%;
@@ -195,13 +218,14 @@
       border: none;
       font-size: 22px;
       cursor: pointer;
-      color: #666;
+      color: var(--rme-text-secondary);
       line-height: 1;
     }
     .modal h3 {
       margin: 0 0 12px 0;
+      font-family: var(--rme-font-heading);
       font-size: 16px;
-      color: #1a3a5c;
+      color: var(--rme-text-heading);
     }
     .modal-actions {
       display: flex;
@@ -212,24 +236,26 @@
       flex: 1;
       padding: 10px;
       border: none;
-      border-radius: 6px;
+      border-radius: var(--rme-radius-sm);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      font-family: var(--rme-font-body);
     }
     .btn-download {
-      background: #1a3a5c;
-      color: #fff;
+      background: var(--rme-accent);
+      color: var(--rme-bg);
     }
     .btn-download:hover {
-      background: #244d73;
+      background: var(--rme-accent-hover);
     }
     .btn-cancel {
-      background: #e8e8ec;
-      color: #333;
+      background: var(--rme-bg-elevated);
+      color: var(--rme-text-secondary);
+      border: 1px solid var(--rme-border);
     }
 
-    /* Story card preview (scaled down in modal) */
+    /* Story card preview */
     .story-preview-wrapper {
       width: 100%;
       display: flex;
@@ -238,15 +264,8 @@
     .story-preview-wrapper canvas {
       max-width: 100%;
       height: auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-
-    /* Hidden rendering container (full size, off-screen) */
-    #story-render {
-      position: fixed;
-      left: -9999px;
-      top: 0;
+      border-radius: var(--rme-radius);
+      border: 1px solid var(--rme-border);
     }
   </style>
 </head>
@@ -298,7 +317,7 @@
       {% endfor %}
     </div>
     <div class="footer">
-      <a href="index.html" style="color:#1a3a5c;text-decoration:none;font-weight:600;">View All Reports</a><br>
+      <a href="index.html">View All Reports</a><br>
       Radio Made Easy &bull; Daily News Digest &bull; Powered by Claude AI
     </div>
   </div>
@@ -319,10 +338,27 @@
   </div>
 
   <script>
+    // ── RME Brand Constants ──
+    const GOLD = '#fdd351';
+    const GOLD_DIM = 'rgba(253, 211, 81, 0.15)';
+    const BG_DARK = '#0a0a0a';
+    const BG_CARD = '#141414';
+    const BG_ELEVATED = '#1c1c1c';
+    const TEXT_PRIMARY = '#e8e8e8';
+    const TEXT_SECONDARY = '#a0a0a0';
+    const BORDER_COLOR = '#2a2a2a';
+    const FONT_HEADING = '"Barlow Semi Condensed", "Barlow", sans-serif';
+    const FONT_BODY = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
     // Instagram Story dimensions: 1080 x 1920 (9:16 portrait)
     const STORY_W = 1080;
     const STORY_H = 1920;
     let currentArticleId = null;
+
+    // RME logo image (cached)
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    logoImg.src = 'https://radiomadeeasy.com/wp-content/uploads/2022/09/RadioMadeEasy.png';
 
     function openStoryModal(idx) {
       const el = document.getElementById('article-' + idx);
@@ -359,33 +395,41 @@
       link.click();
     }
 
-    // Close modal on overlay click
+    // Close modal on overlay click or Escape
     document.getElementById('storyModal').addEventListener('click', function(e) {
       if (e.target === this) closeStoryModal();
     });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeStoryModal();
+    });
 
-    // Color map for topic categories
+    // Topic badge colors (on-brand variants)
     const TOPIC_COLORS = {
-      'RME Mention':             { bg: '#f9e79f', fg: '#7d6608' },
-      'Ham Radio':               { bg: '#d5f5e3', fg: '#1e8449' },
-      'GMRS':                    { bg: '#d4efdf', fg: '#1e8449' },
-      'Emergency Comms':         { bg: '#fadbd8', fg: '#922b21' },
-      'Outages & Infrastructure':{ bg: '#fdebd0', fg: '#b9770e' },
-      'Preparedness & Off-Grid': { bg: '#d6eaf8', fg: '#2471a3' },
-      'FCC & Policy':            { bg: '#e8daef', fg: '#6c3483' },
-      'FCC Enforcement':         { bg: '#f5b7b1', fg: '#78281f' },
-      'Other':                   { bg: '#e8e8ec', fg: '#555'    }
+      'RME Mention':             { bg: GOLD, fg: BG_DARK },
+      'Ham Radio':               { bg: '#4dff88', fg: BG_DARK },
+      'GMRS':                    { bg: '#2ecc71', fg: BG_DARK },
+      'Emergency Comms':         { bg: '#ff4d4d', fg: '#fff' },
+      'Outages & Infrastructure':{ bg: '#e67e22', fg: '#fff' },
+      'Preparedness & Off-Grid': { bg: '#5dade2', fg: BG_DARK },
+      'FCC & Policy':            { bg: '#bb8fce', fg: BG_DARK },
+      'FCC Enforcement':         { bg: '#f1948a', fg: BG_DARK },
+      'Other':                   { bg: '#555', fg: '#fff' }
     };
 
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-      // Returns the Y position after the last line
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
       const words = text.split(' ');
       let line = '';
       let currentY = y;
+      let lineCount = 0;
+      const limit = maxLines || 999;
       for (let i = 0; i < words.length; i++) {
         const testLine = line + words[i] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && i > 0) {
+        if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+          lineCount++;
+          if (lineCount >= limit) {
+            ctx.fillText(line.trim() + '...', x, currentY);
+            return currentY + lineHeight;
+          }
           ctx.fillText(line.trim(), x, currentY);
           line = words[i] + ' ';
           currentY += lineHeight;
@@ -417,140 +461,119 @@
       canvas.height = STORY_H;
       const ctx = canvas.getContext('2d');
       const pad = 72;
+      const contentW = STORY_W - pad * 2;
 
-      // Background gradient
-      const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
-      grad.addColorStop(0, '#0f2640');
-      grad.addColorStop(0.6, '#1a3a5c');
-      grad.addColorStop(1, '#0f2640');
-      ctx.fillStyle = grad;
+      // ── Background ──
+      ctx.fillStyle = BG_DARK;
       ctx.fillRect(0, 0, STORY_W, STORY_H);
 
-      // Subtle grid pattern overlay
-      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < STORY_W; i += 40) {
-        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, STORY_H); ctx.stroke();
-      }
-      for (let i = 0; i < STORY_H; i += 40) {
-        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(STORY_W, i); ctx.stroke();
-      }
+      // Subtle radial glow behind content area
+      const glow = ctx.createRadialGradient(STORY_W / 2, STORY_H * 0.35, 100, STORY_W / 2, STORY_H * 0.35, STORY_W);
+      glow.addColorStop(0, 'rgba(253, 211, 81, 0.04)');
+      glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
 
       let curY = pad;
 
-      // ── RME branding at top ──
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText('RME NEWS SCOUT', pad, curY + 28);
-      curY += 36;
+      // ── RME Logo (if loaded) ──
+      const logoSize = 56;
+      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        ctx.save();
+        drawRoundedRect(ctx, pad, curY, logoSize, logoSize, 10);
+        ctx.clip();
+        ctx.drawImage(logoImg, pad, curY, logoSize, logoSize);
+        ctx.restore();
+      }
 
-      // Date line
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText('{{ date }}', pad, curY + 24);
-      curY += 50;
+      // ── Brand name next to logo ──
+      ctx.fillStyle = GOLD;
+      ctx.font = 'bold 34px ' + FONT_HEADING;
+      ctx.fillText('RADIO MADE EASY', pad + logoSize + 16, curY + 24);
+      ctx.fillStyle = TEXT_SECONDARY;
+      ctx.font = '22px ' + FONT_BODY;
+      ctx.fillText('News Scout', pad + logoSize + 16, curY + 50);
+      curY += logoSize + 32;
 
-      // Divider
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(pad, curY);
-      ctx.lineTo(STORY_W - pad, curY);
-      ctx.stroke();
-      curY += 40;
+      // ── Gold accent line ──
+      ctx.fillStyle = GOLD;
+      ctx.fillRect(pad, curY, 60, 4);
+      curY += 32;
 
       // ── Topic badge ──
       const topicColors = TOPIC_COLORS[data.topic] || TOPIC_COLORS['Other'];
-      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = 'bold 22px ' + FONT_HEADING;
       const topicText = data.topic.toUpperCase();
       const topicMetrics = ctx.measureText(topicText);
-      const badgeW = topicMetrics.width + 28;
-      const badgeH = 36;
+      const badgeW = topicMetrics.width + 32;
+      const badgeH = 38;
 
       drawRoundedRect(ctx, pad, curY, badgeW, badgeH, 6);
       ctx.fillStyle = topicColors.bg;
       ctx.fill();
       ctx.fillStyle = topicColors.fg;
-      ctx.fillText(topicText, pad + 14, curY + 26);
-      curY += badgeH + 30;
+      ctx.fillText(topicText, pad + 16, curY + 27);
+      curY += badgeH + 28;
 
-      // ── Featured image (if available) ──
-      const imageArea = 420;
-      let imageLoaded = false;
+      // ── Featured image ──
+      const imageArea = 400;
 
-      function drawRestOfCard() {
-        // ── Headline ──
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        curY = wrapText(ctx, data.title, pad, curY, STORY_W - pad * 2, 60);
-        curY += 16;
+      function drawContent() {
+        // ── Headline (gold) ──
+        ctx.fillStyle = GOLD;
+        ctx.font = 'bold 50px ' + FONT_HEADING;
+        curY = wrapText(ctx, data.title, pad, curY, contentW, 62, 5);
+        curY += 12;
 
-        // ── Source / Author / Date line ──
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.font = '26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        // ── Source / Author / Date (white secondary) ──
+        ctx.fillStyle = TEXT_SECONDARY;
+        ctx.font = '500 24px ' + FONT_BODY;
         let metaLine = data.source;
-        if (data.author) metaLine += ' — ' + data.author;
-        if (data.published) metaLine += ' · ' + data.published;
-        curY = wrapText(ctx, metaLine, pad, curY, STORY_W - pad * 2, 34);
+        if (data.author) metaLine += '  \u2022  ' + data.author;
+        if (data.published) metaLine += '  \u2022  ' + data.published;
+        curY = wrapText(ctx, metaLine, pad, curY, contentW, 32);
+        curY += 20;
+
+        // ── Divider line ──
+        ctx.fillStyle = BORDER_COLOR;
+        ctx.fillRect(pad, curY, contentW, 1);
         curY += 24;
 
-        // ── Divider ──
-        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(pad, curY);
-        ctx.lineTo(STORY_W - pad, curY);
-        ctx.stroke();
-        curY += 28;
-
-        // ── Summary text ──
+        // ── Summary (light text) ──
         if (data.summary) {
-          ctx.fillStyle = 'rgba(255,255,255,0.85)';
-          ctx.font = '30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-          // Truncate summary to fit remaining space
-          const maxSummaryY = STORY_H - 160;
-          const availableLines = Math.floor((maxSummaryY - curY) / 42);
-          const words = data.summary.split(' ');
-          let truncated = '';
-          let testLine = '';
-          let lines = 0;
-          for (let i = 0; i < words.length; i++) {
-            testLine = truncated + (truncated ? ' ' : '') + words[i];
-            const w = ctx.measureText(testLine).width;
-            if (w > STORY_W - pad * 2) {
-              lines++;
-              if (lines >= availableLines) {
-                truncated += '...';
-                break;
-              }
-              truncated += '\n' + words[i];
-            } else {
-              truncated = testLine;
-            }
-          }
-          curY = wrapText(ctx, truncated.replace(/\n/g, ' '), pad, curY, STORY_W - pad * 2, 42);
+          ctx.fillStyle = TEXT_PRIMARY;
+          ctx.font = '400 28px ' + FONT_BODY;
+          const maxLines = Math.floor((STORY_H - 200 - curY) / 40);
+          curY = wrapText(ctx, data.summary, pad, curY, contentW, 40, Math.max(maxLines, 2));
         }
 
-        // ── Bottom branding bar ──
-        const barH = 80;
+        // ── Bottom bar ──
+        const barH = 100;
         const barY = STORY_H - barH;
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = BG_ELEVATED;
         ctx.fillRect(0, barY, STORY_W, barH);
+        // Gold top border on bar
+        ctx.fillStyle = GOLD;
+        ctx.fillRect(0, barY, STORY_W, 2);
 
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        // Site URL centered
+        ctx.fillStyle = GOLD;
+        ctx.font = 'bold 26px ' + FONT_HEADING;
         ctx.textAlign = 'center';
-        ctx.fillText('radiomadeeasy.com', STORY_W / 2, barY + 48);
+        ctx.fillText('radiomadeeasy.com', STORY_W / 2, barY + 42);
+        // Tagline
+        ctx.fillStyle = TEXT_SECONDARY;
+        ctx.font = '400 20px ' + FONT_BODY;
+        ctx.fillText('You need off grid comms. We make it easy.', STORY_W / 2, barY + 72);
         ctx.textAlign = 'left';
       }
 
-      // Try to load the featured image
+      // Try to load featured image
       if (data.image) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = function() {
-          // Draw image with rounded corners and cover-fit
-          const imgW = STORY_W - pad * 2;
+          const imgW = contentW;
           const imgH = imageArea;
           const scale = Math.max(imgW / img.width, imgH / img.height);
           const sw = imgW / scale;
@@ -559,27 +582,34 @@
           const sy = (img.height - sh) / 2;
 
           ctx.save();
-          drawRoundedRect(ctx, pad, curY, imgW, imgH, 12);
+          drawRoundedRect(ctx, pad, curY, imgW, imgH, 10);
           ctx.clip();
           ctx.drawImage(img, sx, sy, sw, sh, pad, curY, imgW, imgH);
-          // Dark overlay at bottom of image for readability
-          const imgGrad = ctx.createLinearGradient(0, curY + imgH - 100, 0, curY + imgH);
-          imgGrad.addColorStop(0, 'rgba(0,0,0,0)');
-          imgGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
+          // Subtle dark gradient at bottom edge
+          const imgGrad = ctx.createLinearGradient(0, curY + imgH - 80, 0, curY + imgH);
+          imgGrad.addColorStop(0, 'rgba(10,10,10,0)');
+          imgGrad.addColorStop(1, 'rgba(10,10,10,0.6)');
           ctx.fillStyle = imgGrad;
           ctx.fillRect(pad, curY, imgW, imgH);
           ctx.restore();
 
-          curY += imgH + 32;
-          drawRestOfCard();
+          // Thin gold border around image
+          ctx.save();
+          drawRoundedRect(ctx, pad, curY, imgW, imgH, 10);
+          ctx.strokeStyle = 'rgba(253, 211, 81, 0.2)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+
+          curY += imgH + 28;
+          drawContent();
         };
         img.onerror = function() {
-          // No image — just draw the rest
-          drawRestOfCard();
+          drawContent();
         };
         img.src = data.image;
       } else {
-        drawRestOfCard();
+        drawContent();
       }
     }
   </script>
