@@ -34,6 +34,20 @@
       font-size: 14px;
       opacity: 0.85;
     }
+    .header-nav {
+      margin-top: 10px;
+    }
+    .header-nav a {
+      color: #fff;
+      opacity: 0.8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .header-nav a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
     .body {
       padding: 20px 28px;
     }
@@ -43,6 +57,7 @@
       border-left: 4px solid #ddd;
       background: #fafafa;
       border-radius: 0 4px 4px 0;
+      position: relative;
     }
     .article.score-5 { border-left-color: #2ecc71; }
     .article.score-4 { border-left-color: #27ae60; }
@@ -131,15 +146,121 @@
       font-size: 12px;
       color: #999;
     }
+
+    /* Share button */
+    .share-btn {
+      display: inline-block;
+      background: #1a3a5c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .share-btn:hover {
+      background: #244d73;
+    }
+
+    /* Story card modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 420px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+      line-height: 1;
+    }
+    .modal h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: #1a3a5c;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-download {
+      background: #1a3a5c;
+      color: #fff;
+    }
+    .btn-download:hover {
+      background: #244d73;
+    }
+    .btn-cancel {
+      background: #e8e8ec;
+      color: #333;
+    }
+
+    /* Story card preview (scaled down in modal) */
+    .story-preview-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .story-preview-wrapper canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Hidden rendering container (full size, off-screen) */
+    #story-render {
+      position: fixed;
+      left: -9999px;
+      top: 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>RME News Scout</h1>
-      <p>March 23, 2026 &mdash; 4 articles today</p>
+      <p>March 23, 2026 &mdash; 8 articles today</p>
+      <div class="header-nav">
+        <a href="index.html">&#9664; All Reports</a>
+      </div>
     </div>
     <div class="body">
+      
       
       <div class="section-title">RME Mention</div>
       
@@ -148,7 +269,34 @@
       
       <div class="section-title">Ham Radio</div>
       
-      <div class="no-articles">No articles found</div>
+      
+      <div class="article score-5"
+           id="article-0"
+           data-title="RTL-SDR USB Software Defined Radio Receiver Kit – For ADS-B, Air Traffic, Scanning - ruhrkanal.news"
+           data-source="Google News - Ham Radio"
+           data-author=""
+           data-published="Mar 23, 12:11 PM"
+           data-summary="RTL-SDR USB Software Defined Radio Receiver Kit – For ADS-B, Air Traffic, Scanning  ruhrkanal.news"
+           data-image=""
+           data-topic="Ham Radio"
+           data-score="5"
+           data-url="https://news.google.com/rss/articles/CBMifkFVX3lxTE9EbmVETUpHQnM3REI0MHZJMjZfclgtNW5vMWtka05rOVB4c2h6NDZ3TVpWSnhRQWE2RWh0eUxZYlFvR0R0MHpCelMySV9aaWxKRDRlelg4SHpVbmlISERXTnE2TmVEVnJXM2w3SjZienB2TVJqcjRXVGFjdDE1Zw?oc=5">
+        <a class="title" href="https://news.google.com/rss/articles/CBMifkFVX3lxTE9EbmVETUpHQnM3REI0MHZJMjZfclgtNW5vMWtka05rOVB4c2h6NDZ3TVpWSnhRQWE2RWh0eUxZYlFvR0R0MHpCelMySV9aaWxKRDRlelg4SHpVbmlISERXTnE2TmVEVnJXM2w3SjZienB2TVJqcjRXVGFjdDE1Zw?oc=5">RTL-SDR USB Software Defined Radio Receiver Kit – For ADS-B, Air Traffic, Scanning - ruhrkanal.news</a>
+        <div class="badges">
+          <span class="score-badge">5/5</span>
+          <span class="source-name">Google News - Ham Radio</span>
+          
+        </div>
+        
+        <div class="article-date">Mar 23, 12:11 PM</div>
+        
+        
+        <div class="rationale">Directly about SDR (software defined radio) receivers used for scanning and radio reception, core interest for ham radio enthusiasts.</div>
+        
+        <button class="share-btn" onclick="openStoryModal(0)">IG Story</button>
+      </div>
+      
+      
       
       
       <div class="section-title">GMRS</div>
@@ -159,66 +307,199 @@
       <div class="section-title">Emergency Comms</div>
       
       
-      <div class="article score-3">
+      <div class="article score-3"
+           id="article-1"
+           data-title="Habersham County names new Director of EMA/911 Operations - AccessWDUN"
+           data-source="Google News - Emergency Comms"
+           data-author=""
+           data-published="Mar 23, 03:39 PM"
+           data-summary="Habersham County names new Director of EMA/911 Operations  AccessWDUN"
+           data-image=""
+           data-topic="Emergency Comms"
+           data-score="3"
+           data-url="https://news.google.com/rss/articles/CBMijgFBVV95cUxPU3E5Y0p5cmw0UWM3ZXRDcEVwemhtU0I5eXpRVG1paDNSSHNRUjFVMVU4UG5ONllJeG5WRmd2SXhRXzM5d0dvdU5nSE5Fd2l3M1htVzktQUNGOVotZUV3SktfMmV6MnIwVmJjakNmTFNFQTVUZWs3cmJlYkhEX2pZNDlCS0dsR2hEdVhuV0t3?oc=5">
         <a class="title" href="https://news.google.com/rss/articles/CBMijgFBVV95cUxPU3E5Y0p5cmw0UWM3ZXRDcEVwemhtU0I5eXpRVG1paDNSSHNRUjFVMVU4UG5ONllJeG5WRmd2SXhRXzM5d0dvdU5nSE5Fd2l3M1htVzktQUNGOVotZUV3SktfMmV6MnIwVmJjakNmTFNFQTVUZWs3cmJlYkhEX2pZNDlCS0dsR2hEdVhuV0t3?oc=5">Habersham County names new Director of EMA/911 Operations - AccessWDUN</a>
         <div class="badges">
           <span class="score-badge">3/5</span>
           <span class="source-name">Google News - Emergency Comms</span>
+          
         </div>
         
         <div class="article-date">Mar 23, 03:39 PM</div>
         
         
-        <div class="rationale">Emergency management leadership appointment is moderately related to emergency communications but lacks specific ham radio or GMRS relevance.</div>
+        <div class="rationale">Emergency management and 911 operations administration moderately relevant to RME&#39;s emergency communications focus.</div>
         
+        <button class="share-btn" onclick="openStoryModal(1)">IG Story</button>
       </div>
       
-      <div class="article score-3">
+      
+      <div class="article score-3"
+           id="article-2"
+           data-title="Habersham names Bellinger EMA/911 director - Now Georgia"
+           data-source="Google News - Emergency Comms"
+           data-author=""
+           data-published="Mar 23, 03:53 PM"
+           data-summary="Habersham names Bellinger EMA/911 director  Now Georgia"
+           data-image=""
+           data-topic="Emergency Comms"
+           data-score="3"
+           data-url="https://news.google.com/rss/articles/CBMidEFVX3lxTE51YlgtZ0dnd1dnckhjcTdjUHZaX1RPWUw2NFFWMDZoOFVkU3gzVkNFdkljWUZ5cnNibURQdEVOcjJxOFFMMExqby12alA4MWdPa2pXbHZIRlJ1akp5bVZHQW16a2lNR2t6V0ZVUzhLTktiY1ZZ?oc=5">
         <a class="title" href="https://news.google.com/rss/articles/CBMidEFVX3lxTE51YlgtZ0dnd1dnckhjcTdjUHZaX1RPWUw2NFFWMDZoOFVkU3gzVkNFdkljWUZ5cnNibURQdEVOcjJxOFFMMExqby12alA4MWdPa2pXbHZIRlJ1akp5bVZHQW16a2lNR2t6V0ZVUzhLTktiY1ZZ?oc=5">Habersham names Bellinger EMA/911 director - Now Georgia</a>
         <div class="badges">
           <span class="score-badge">3/5</span>
           <span class="source-name">Google News - Emergency Comms</span>
+          
         </div>
         
         <div class="article-date">Mar 23, 03:53 PM</div>
         
         
-        <div class="rationale">EMA/911 director appointment is moderately related to emergency communications infrastructure and preparedness.</div>
+        <div class="rationale">Emergency management director appointment moderately relevant to RME&#39;s emergency communications community.</div>
         
+        <button class="share-btn" onclick="openStoryModal(2)">IG Story</button>
       </div>
+      
       
       
       
       <div class="section-title">Outages &amp; Infrastructure</div>
       
       
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMipwFBVV95cUxONGMtckQyVkdjNmZ3M0NpTDlzcE56Q2NkejZMeU1kWE01TFF3cl9YaUZpa0xWcWxJWWJ6WnpTSDlRdVFDWkFRcVN5Rmx0WXRIcVhoUXl5SkZ6ZkoxMmdXVGRsbHZQblVwb0t0alY3eGEwNFktX1NOZ0pGYTJvOUNDYnlOYlUxemJHbnAtS1dvc0l3MlBoWlV1MGNvbWhDdlFUZWJ5RnlJRdIBpwFBVV95cUxONGMtckQyVkdjNmZ3M0NpTDlzcE56Q2NkejZMeU1kWE01TFF3cl9YaUZpa0xWcWxJWWJ6WnpTSDlRdVFDWkFRcVN5Rmx0WXRIcVhoUXl5SkZ6ZkoxMmdXVGRsbHZQblVwb0t0alY3eGEwNFktX1NOZ0pGYTJvOUNDYnlOYlUxemJHbnAtS1dvc0l3MlBoWlV1MGNvbWhDdlFUZWJ5RnlJRQ?oc=5">Kyiv experiences power and water supply disruptions due to power grid failure - KMDA - Українські Національні Новини (УНН)</a>
+      <div class="article score-4"
+           id="article-3"
+           data-title="Hybrid energy solution deployed to protect onshore wind farm during network outage - theenergyst.com"
+           data-source="Google News - Internet Outage"
+           data-author=""
+           data-published="Mar 23, 11:37 AM"
+           data-summary="Hybrid energy solution deployed to protect onshore wind farm during network outage  theenergyst.com"
+           data-image=""
+           data-topic="Outages &amp; Infrastructure"
+           data-score="4"
+           data-url="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNalh4bVlKUDlKT1dzQWE4RGVuTjZWMXJ5aVhuNzRRTHBVX3dkTUZyUFlhdnJFVFNSbTVvSzBNZ3hsWjdNamtFZjlGaW16OGpBbnlYSXpJMlduY19yMzM1NDEwUlhxY2RwN2JmQlFvSlRZaWZoLWUzNlNhWjJoNUZUZXkwdkRaNC1fMWE0QmlYZFF3cU9ZdnpYWGk0RUhiMnR0Zzlvb0Mwb1lDMnM?oc=5">
+        <a class="title" href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNalh4bVlKUDlKT1dzQWE4RGVuTjZWMXJ5aVhuNzRRTHBVX3dkTUZyUFlhdnJFVFNSbTVvSzBNZ3hsWjdNamtFZjlGaW16OGpBbnlYSXpJMlduY19yMzM1NDEwUlhxY2RwN2JmQlFvSlRZaWZoLWUzNlNhWjJoNUZUZXkwdkRaNC1fMWE0QmlYZFF3cU9ZdnpYWGk0RUhiMnR0Zzlvb0Mwb1lDMnM?oc=5">Hybrid energy solution deployed to protect onshore wind farm during network outage - theenergyst.com</a>
+        <div class="badges">
+          <span class="score-badge">4/5</span>
+          <span class="source-name">Google News - Internet Outage</span>
+          
+        </div>
+        
+        <div class="article-date">Mar 23, 11:37 AM</div>
+        
+        
+        <div class="rationale">Hybrid energy solution protecting infrastructure during network outage is strongly relevant to RME&#39;s audience interested in off-grid resilience.</div>
+        
+        <button class="share-btn" onclick="openStoryModal(3)">IG Story</button>
+      </div>
+      
+      
+      <div class="article score-4"
+           id="article-4"
+           data-title="America’s aging power grid faces new demands | The Excerpt - USA Today"
+           data-source="Google News - Power Grid"
+           data-author=""
+           data-published="Mar 23, 01:19 PM"
+           data-summary="America’s aging power grid faces new demands | The Excerpt  USA Today"
+           data-image=""
+           data-topic="Outages &amp; Infrastructure"
+           data-score="4"
+           data-url="https://news.google.com/rss/articles/CBMivwFBVV95cUxObGotM3VUc3V1N19PM2c1SnJEMmluLW5lb29ZN1ItaGRmcHlPZGg3ZFZ0eXpERFU5QTNwMzBvTjl0b0VKSkxtQUVwQmxYYXA2YXo5QjZJNnF6ODRRS0lWZjlZbWVKV1hwQXpXMnJ2R3RlSUI4VGlOU25YSno3MUNObjYyaVhaeXdXamxiRzQ1RXVzV0dBNWFmRHJGTkgxRndDVEFrZy1BbzB3SzZGanVsaFZsRzh4SFNuODdWai02NA?oc=5">
+        <a class="title" href="https://news.google.com/rss/articles/CBMivwFBVV95cUxObGotM3VUc3V1N19PM2c1SnJEMmluLW5lb29ZN1ItaGRmcHlPZGg3ZFZ0eXpERFU5QTNwMzBvTjl0b0VKSkxtQUVwQmxYYXA2YXo5QjZJNnF6ODRRS0lWZjlZbWVKV1hwQXpXMnJ2R3RlSUI4VGlOU25YSno3MUNObjYyaVhaeXdXamxiRzQ1RXVzV0dBNWFmRHJGTkgxRndDVEFrZy1BbzB3SzZGanVsaFZsRzh4SFNuODdWai02NA?oc=5">America’s aging power grid faces new demands | The Excerpt - USA Today</a>
         <div class="badges">
           <span class="score-badge">4/5</span>
           <span class="source-name">Google News - Power Grid</span>
+          
         </div>
         
-        <div class="article-date">Mar 21, 08:58 PM</div>
+        <div class="article-date">Mar 23, 01:19 PM</div>
         
         
-        <div class="rationale">Power grid failure demonstrates critical infrastructure vulnerability relevant to RME&#39;s off-grid preparedness audience.</div>
+        <div class="rationale">Power grid vulnerability and infrastructure resilience directly relevant to RME&#39;s preparedness and emergency communications audience.</div>
         
+        <button class="share-btn" onclick="openStoryModal(4)">IG Story</button>
       </div>
       
-      <div class="article score-4">
+      
+      <div class="article score-4"
+           id="article-5"
+           data-title="Cuba’s power grid collapses leaving it without electricity for the 3rd time this month - Politico"
+           data-source="Google News - Power Grid"
+           data-author=""
+           data-published="Mar 22, 11:24 AM"
+           data-summary="Cuba’s power grid collapses leaving it without electricity for the 3rd time this month  Politico"
+           data-image=""
+           data-topic="Outages &amp; Infrastructure"
+           data-score="4"
+           data-url="https://news.google.com/rss/articles/CBMi0AFBVV95cUxPYmdoTHFrMmdDVHRZRElrTWx5Q041clhocy10RGZ5ZmZGY05hUnpScjVEejVmbHpQUUpCM0NQdUlOSVZxRDBGTWhsRzVLRVZqVTZnbzZzbGRxVWR5V1IyOEhIMlRFOHJjeDlQeTV1b2Fsd3FvWG9OaW5ZYVRzYXZMMmZzNlV5V0hOSjQ1LXJZQ2M5d05FVGRGQjM5TmpkWmRuT1B6b3c0NUtjRXByZVRoVjNrZm15ZWp5ZVRYdzBwQWVscDVfS1ZOWk9mWXBQTzVs?oc=5">
+        <a class="title" href="https://news.google.com/rss/articles/CBMi0AFBVV95cUxPYmdoTHFrMmdDVHRZRElrTWx5Q041clhocy10RGZ5ZmZGY05hUnpScjVEejVmbHpQUUpCM0NQdUlOSVZxRDBGTWhsRzVLRVZqVTZnbzZzbGRxVWR5V1IyOEhIMlRFOHJjeDlQeTV1b2Fsd3FvWG9OaW5ZYVRzYXZMMmZzNlV5V0hOSjQ1LXJZQ2M5d05FVGRGQjM5TmpkWmRuT1B6b3c0NUtjRXByZVRoVjNrZm15ZWp5ZVRYdzBwQWVscDVfS1ZOWk9mWXBQTzVs?oc=5">Cuba’s power grid collapses leaving it without electricity for the 3rd time this month - Politico</a>
+        <div class="badges">
+          <span class="score-badge">4/5</span>
+          <span class="source-name">Google News - Power Grid</span>
+          
+        </div>
+        
+        <div class="article-date">Mar 22, 11:24 AM</div>
+        
+        
+        <div class="rationale">Major power grid collapse demonstrates critical infrastructure failure scenarios relevant to emergency preparedness and off-grid solutions.</div>
+        
+        <button class="share-btn" onclick="openStoryModal(5)">IG Story</button>
+      </div>
+      
+      
+      <div class="article score-4"
+           id="article-6"
+           data-title="Cuba Restores Power After Second Nation-Wide Blackout - StratNews Global"
+           data-source="Google News - Power Grid"
+           data-author=""
+           data-published="Mar 23, 01:00 PM"
+           data-summary="Cuba Restores Power After Second Nation-Wide Blackout  StratNews Global"
+           data-image=""
+           data-topic="Outages &amp; Infrastructure"
+           data-score="4"
+           data-url="https://news.google.com/rss/articles/CBMiowFBVV95cUxOV296X296ODhQNzVTQlRTU2hDcGVYbFZobnNtWUNQemdtNlM3LTBsT2Fla0gzaTJXZnF6NzhKbnJaWExtOEVyZXUtNW56ZjRPbm42VjZPOFFDU1JucDN6bTM2aDdiSGdQbXQyUy1INkg4ZEVuUGF6emw0VWdZVHVlVmE4M0I0VGZzQzE1RVRtMFBXUXBSWVdrOWt6WGUzTWdCOTRn?oc=5">
+        <a class="title" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxOV296X296ODhQNzVTQlRTU2hDcGVYbFZobnNtWUNQemdtNlM3LTBsT2Fla0gzaTJXZnF6NzhKbnJaWExtOEVyZXUtNW56ZjRPbm42VjZPOFFDU1JucDN6bTM2aDdiSGdQbXQyUy1INkg4ZEVuUGF6emw0VWdZVHVlVmE4M0I0VGZzQzE1RVRtMFBXUXBSWVdrOWt6WGUzTWdCOTRn?oc=5">Cuba Restores Power After Second Nation-Wide Blackout - StratNews Global</a>
+        <div class="badges">
+          <span class="score-badge">4/5</span>
+          <span class="source-name">Google News - Power Grid</span>
+          
+        </div>
+        
+        <div class="article-date">Mar 23, 01:00 PM</div>
+        
+        
+        <div class="rationale">Nation-wide blackout event illustrates infrastructure vulnerability relevant to RME&#39;s emergency communications and preparedness focus.</div>
+        
+        <button class="share-btn" onclick="openStoryModal(6)">IG Story</button>
+      </div>
+      
+      
+      <div class="article score-4"
+           id="article-7"
+           data-title="Cuba restores power to Havana after second grid collapse in a week - ThePrint"
+           data-source="Google News - Power Grid"
+           data-author=""
+           data-published="Mar 22, 09:00 PM"
+           data-summary="Cuba restores power to Havana after second grid collapse in a week  ThePrint"
+           data-image=""
+           data-topic="Outages &amp; Infrastructure"
+           data-score="4"
+           data-url="https://news.google.com/rss/articles/CBMiowFBVV95cUxPaVR3NE8teVVQcDN1RTZWWWJ6alNrTnFrRHE5TGxSRnd0UlNVVHc1eXZaMHExLU9hY3RTMjcxaEVEd1ZxbHRxM0ZQV2hkSElrNHZQMW9xQ0RqMDNTckVTYTFrcVRjMDU2OHpqa3Y5UjRHSHpmQkdHRUFaMGZ2cGl0bWZINEhJX29YZi1HVXR2Wk50VHY3OXQtcWRJREYzSFZoU0E40gGoAUFVX3lxTE9ISTlFdHktVHNXanBNZFVwZHVPcHRYMVFKTzJQR01PeURJTHNrLUdBcmktNGxvMUptQ3c2R0FCS2VQZDUzcTE0ZTZCdTdNSzNwU3VIbWRtME1Md0hvYmJQU2NNTGJ3dkV0T0N1T0dxbjdWUU1SMkJGbXNyMXVqb2FpUm9vYmotQjZDYzdtQV9YOXNlYngzekhtUHhySWVtT2lMWVVXMlVEbg?oc=5">
         <a class="title" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxPaVR3NE8teVVQcDN1RTZWWWJ6alNrTnFrRHE5TGxSRnd0UlNVVHc1eXZaMHExLU9hY3RTMjcxaEVEd1ZxbHRxM0ZQV2hkSElrNHZQMW9xQ0RqMDNTckVTYTFrcVRjMDU2OHpqa3Y5UjRHSHpmQkdHRUFaMGZ2cGl0bWZINEhJX29YZi1HVXR2Wk50VHY3OXQtcWRJREYzSFZoU0E40gGoAUFVX3lxTE9ISTlFdHktVHNXanBNZFVwZHVPcHRYMVFKTzJQR01PeURJTHNrLUdBcmktNGxvMUptQ3c2R0FCS2VQZDUzcTE0ZTZCdTdNSzNwU3VIbWRtME1Md0hvYmJQU2NNTGJ3dkV0T0N1T0dxbjdWUU1SMkJGbXNyMXVqb2FpUm9vYmotQjZDYzdtQV9YOXNlYngzekhtUHhySWVtT2lMWVVXMlVEbg?oc=5">Cuba restores power to Havana after second grid collapse in a week - ThePrint</a>
         <div class="badges">
           <span class="score-badge">4/5</span>
           <span class="source-name">Google News - Power Grid</span>
+          
         </div>
         
         <div class="article-date">Mar 22, 09:00 PM</div>
         
         
-        <div class="rationale">Major grid collapse event is directly relevant to emergency preparedness and infrastructure resilience concerns of RME&#39;s audience.</div>
+        <div class="rationale">Major power grid collapse directly relevant to RME&#39;s off-grid preparedness and emergency communications audience.</div>
         
+        <button class="share-btn" onclick="openStoryModal(7)">IG Story</button>
       </div>
+      
       
       
       
@@ -248,5 +529,286 @@
       Radio Made Easy &bull; Daily News Digest &bull; Powered by Claude AI
     </div>
   </div>
+
+  <!-- Story card modal -->
+  <div class="modal-overlay" id="storyModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeStoryModal()">&times;</button>
+      <h3>Instagram Story Image</h3>
+      <div class="story-preview-wrapper">
+        <canvas id="storyCanvas"></canvas>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeStoryModal()">Cancel</button>
+        <button class="btn-download" id="downloadBtn" onclick="downloadStory()">Download PNG</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Instagram Story dimensions: 1080 x 1920 (9:16 portrait)
+    const STORY_W = 1080;
+    const STORY_H = 1920;
+    let currentArticleId = null;
+
+    function openStoryModal(idx) {
+      const el = document.getElementById('article-' + idx);
+      if (!el) return;
+      currentArticleId = idx;
+
+      const data = {
+        title: el.dataset.title,
+        source: el.dataset.source,
+        author: el.dataset.author,
+        published: el.dataset.published,
+        summary: el.dataset.summary,
+        image: el.dataset.image,
+        topic: el.dataset.topic,
+        score: el.dataset.score,
+        url: el.dataset.url
+      };
+
+      document.getElementById('storyModal').classList.add('active');
+      renderStoryCard(data);
+    }
+
+    function closeStoryModal() {
+      document.getElementById('storyModal').classList.remove('active');
+    }
+
+    function downloadStory() {
+      const canvas = document.getElementById('storyCanvas');
+      const link = document.createElement('a');
+      const el = document.getElementById('article-' + currentArticleId);
+      const slug = (el?.dataset.title || 'story').replace(/[^a-zA-Z0-9]+/g, '-').substring(0, 50).toLowerCase();
+      link.download = 'rme-story-' + slug + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('storyModal').addEventListener('click', function(e) {
+      if (e.target === this) closeStoryModal();
+    });
+
+    // Color map for topic categories
+    const TOPIC_COLORS = {
+      'RME Mention':             { bg: '#f9e79f', fg: '#7d6608' },
+      'Ham Radio':               { bg: '#d5f5e3', fg: '#1e8449' },
+      'GMRS':                    { bg: '#d4efdf', fg: '#1e8449' },
+      'Emergency Comms':         { bg: '#fadbd8', fg: '#922b21' },
+      'Outages & Infrastructure':{ bg: '#fdebd0', fg: '#b9770e' },
+      'Preparedness & Off-Grid': { bg: '#d6eaf8', fg: '#2471a3' },
+      'FCC & Policy':            { bg: '#e8daef', fg: '#6c3483' },
+      'FCC Enforcement':         { bg: '#f5b7b1', fg: '#78281f' },
+      'Other':                   { bg: '#e8e8ec', fg: '#555'    }
+    };
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      // Returns the Y position after the last line
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line.trim(), x, currentY);
+          line = words[i] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, currentY);
+      return currentY + lineHeight;
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function renderStoryCard(data) {
+      const canvas = document.getElementById('storyCanvas');
+      canvas.width = STORY_W;
+      canvas.height = STORY_H;
+      const ctx = canvas.getContext('2d');
+      const pad = 72;
+
+      // Background gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
+      grad.addColorStop(0, '#0f2640');
+      grad.addColorStop(0.6, '#1a3a5c');
+      grad.addColorStop(1, '#0f2640');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // Subtle grid pattern overlay
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < STORY_W; i += 40) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, STORY_H); ctx.stroke();
+      }
+      for (let i = 0; i < STORY_H; i += 40) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(STORY_W, i); ctx.stroke();
+      }
+
+      let curY = pad;
+
+      // ── RME branding at top ──
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('RME NEWS SCOUT', pad, curY + 28);
+      curY += 36;
+
+      // Date line
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('March 23, 2026', pad, curY + 24);
+      curY += 50;
+
+      // Divider
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, curY);
+      ctx.lineTo(STORY_W - pad, curY);
+      ctx.stroke();
+      curY += 40;
+
+      // ── Topic badge ──
+      const topicColors = TOPIC_COLORS[data.topic] || TOPIC_COLORS['Other'];
+      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const topicText = data.topic.toUpperCase();
+      const topicMetrics = ctx.measureText(topicText);
+      const badgeW = topicMetrics.width + 28;
+      const badgeH = 36;
+
+      drawRoundedRect(ctx, pad, curY, badgeW, badgeH, 6);
+      ctx.fillStyle = topicColors.bg;
+      ctx.fill();
+      ctx.fillStyle = topicColors.fg;
+      ctx.fillText(topicText, pad + 14, curY + 26);
+      curY += badgeH + 30;
+
+      // ── Featured image (if available) ──
+      const imageArea = 420;
+      let imageLoaded = false;
+
+      function drawRestOfCard() {
+        // ── Headline ──
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        curY = wrapText(ctx, data.title, pad, curY, STORY_W - pad * 2, 60);
+        curY += 16;
+
+        // ── Source / Author / Date line ──
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        let metaLine = data.source;
+        if (data.author) metaLine += ' — ' + data.author;
+        if (data.published) metaLine += ' · ' + data.published;
+        curY = wrapText(ctx, metaLine, pad, curY, STORY_W - pad * 2, 34);
+        curY += 24;
+
+        // ── Divider ──
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad, curY);
+        ctx.lineTo(STORY_W - pad, curY);
+        ctx.stroke();
+        curY += 28;
+
+        // ── Summary text ──
+        if (data.summary) {
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.font = '30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          // Truncate summary to fit remaining space
+          const maxSummaryY = STORY_H - 160;
+          const availableLines = Math.floor((maxSummaryY - curY) / 42);
+          const words = data.summary.split(' ');
+          let truncated = '';
+          let testLine = '';
+          let lines = 0;
+          for (let i = 0; i < words.length; i++) {
+            testLine = truncated + (truncated ? ' ' : '') + words[i];
+            const w = ctx.measureText(testLine).width;
+            if (w > STORY_W - pad * 2) {
+              lines++;
+              if (lines >= availableLines) {
+                truncated += '...';
+                break;
+              }
+              truncated += '\n' + words[i];
+            } else {
+              truncated = testLine;
+            }
+          }
+          curY = wrapText(ctx, truncated.replace(/\n/g, ' '), pad, curY, STORY_W - pad * 2, 42);
+        }
+
+        // ── Bottom branding bar ──
+        const barH = 80;
+        const barY = STORY_H - barH;
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(0, barY, STORY_W, barH);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('radiomadeeasy.com', STORY_W / 2, barY + 48);
+        ctx.textAlign = 'left';
+      }
+
+      // Try to load the featured image
+      if (data.image) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          // Draw image with rounded corners and cover-fit
+          const imgW = STORY_W - pad * 2;
+          const imgH = imageArea;
+          const scale = Math.max(imgW / img.width, imgH / img.height);
+          const sw = imgW / scale;
+          const sh = imgH / scale;
+          const sx = (img.width - sw) / 2;
+          const sy = (img.height - sh) / 2;
+
+          ctx.save();
+          drawRoundedRect(ctx, pad, curY, imgW, imgH, 12);
+          ctx.clip();
+          ctx.drawImage(img, sx, sy, sw, sh, pad, curY, imgW, imgH);
+          // Dark overlay at bottom of image for readability
+          const imgGrad = ctx.createLinearGradient(0, curY + imgH - 100, 0, curY + imgH);
+          imgGrad.addColorStop(0, 'rgba(0,0,0,0)');
+          imgGrad.addColorStop(1, 'rgba(0,0,0,0.4)');
+          ctx.fillStyle = imgGrad;
+          ctx.fillRect(pad, curY, imgW, imgH);
+          ctx.restore();
+
+          curY += imgH + 32;
+          drawRestOfCard();
+        };
+        img.onerror = function() {
+          // No image — just draw the rest
+          drawRestOfCard();
+        };
+        img.src = data.image;
+      } else {
+        drawRestOfCard();
+      }
+    }
+  </script>
 </body>
 </html>
