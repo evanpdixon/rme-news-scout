@@ -149,9 +149,7 @@
 
     /* Share button */
     .share-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
+      display: inline-block;
       background: #1a3a5c;
       color: #fff;
       border: none;
@@ -160,11 +158,7 @@
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .article:hover .share-btn {
-      opacity: 1;
+      margin-top: 6px;
     }
     .share-btn:hover {
       background: #244d73;
@@ -283,7 +277,6 @@
            data-score="{{ art.score | default(3) }}"
            data-url="{{ art.url }}">
         <a class="title" href="{{ art.url }}">{{ art.title }}</a>
-        <button class="share-btn" onclick="openStoryModal({{ article_index.n }})">IG Story</button>
         <div class="badges">
           <span class="score-badge">{{ art.score | default("?") }}/5</span>
           <span class="source-name">{{ art.source }}</span>
@@ -295,6 +288,7 @@
         {% if art.rationale %}
         <div class="rationale">{{ art.rationale }}</div>
         {% endif %}
+        <button class="share-btn" onclick="openStoryModal({{ article_index.n }})">IG Story</button>
       </div>
       {% set article_index.n = article_index.n + 1 %}
       {% endfor %}
