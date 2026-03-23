@@ -63,8 +63,8 @@ def _extract_favicon(html: str, base_url: str) -> str:
 def _fetch_metadata(article: dict) -> dict:
     """Follow article URL to get real source info, image, author, summary."""
     url = article.get("url", "")
-    if not url:
-        return article
+    if not url or "news.google.com/rss/articles/" in url:
+        return article  # Skip Google News redirect URLs (can't resolve without JS)
 
     try:
         resp = httpx.get(
