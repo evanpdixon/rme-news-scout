@@ -127,17 +127,18 @@ def _fetch_metadata(article: dict) -> dict:
             if author:
                 article["author"] = author
 
-        # Description / summary — always prefer the og:description for story cards
+        # Description — only use og:description if it looks article-specific
+        # (>80 chars). Short descriptions are usually generic site taglines.
         desc = _extract_meta(html, [
             "og:description",
             "description",
             "twitter:description",
         ])
-        if desc:
+        if desc and len(desc) > 80:
             article["og_description"] = desc[:600]
-            # Also backfill summary if empty
-            if not article.get("summary"):
-                article["summary"] = desc[:500]
+        # Backfill summary if empty
+        if not article.get("summary") and desc:
+            article["summary"] = desc[:500]
 
         # Source favicon/logo
         favicon = _extract_favicon(html, final_url)

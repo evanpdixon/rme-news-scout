@@ -434,6 +434,14 @@
       });
     }
 
+    function faviconUrl(articleUrl) {
+      // Use Google's favicon API — always CORS-safe, consistent quality
+      try {
+        const domain = new URL(articleUrl).hostname;
+        return 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
+      } catch(e) { return ''; }
+    }
+
     async function renderStoryCard(data) {
       const canvas = document.getElementById('storyCanvas');
       canvas.width = STORY_W;
@@ -442,10 +450,10 @@
       const pad = 60;
       const contentW = STORY_W - pad * 2;
 
-      // Load images in parallel
+      // Load images in parallel — use Google favicon API for CORS-safe favicons
       const [featuredImg, faviconImg] = await Promise.all([
         loadImage(data.image),
-        loadImage(data.favicon)
+        loadImage(faviconUrl(data.url))
       ]);
 
       // ── Full-bleed featured image as background ──
@@ -546,16 +554,6 @@
       }
 
       // Bottom LINK_STICKER_ZONE (40px) reserved for IG link sticker
-      // Debug: log what we rendered
-      console.log('Story card rendered:', {
-        title: data.title?.substring(0, 40),
-        source: data.source,
-        summary: summaryText?.substring(0, 60),
-        summaryLen: summaryText.length,
-        hasImage: !!featuredImg,
-        hasFavicon: !!faviconImg,
-        finalY: curY
-      });
     }
   </script>
 </body>
