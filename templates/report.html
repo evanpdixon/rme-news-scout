@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RME News Scout -- March 22, 2026</title>
+  <title>RME News Scout -- {{ date }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -273,279 +273,48 @@
   <div class="container">
     <div class="header">
       <h1>RME News Scout</h1>
-      <p>March 22, 2026 &mdash; 16 articles today</p>
+      <p>{{ date }} &mdash; {{ total }} article{{ "s" if total != 1 }} today</p>
+      <div class="header-nav">
+        <a href="index.html">&#9664; All Reports</a>
+      </div>
     </div>
     <div class="body">
-      
-      <div class="section-title">RME Mention</div>
-      
+      {% set article_index = namespace(n=0) %}
+      {% for topic, topic_articles in grouped.items() %}
+      <div class="section-title">{{ topic }}</div>
+      {% if topic_articles %}
+      {% for art in topic_articles %}
+      <div class="article score-{{ art.score | default(3) }}"
+           id="article-{{ article_index.n }}"
+           data-title="{{ art.title }}"
+           data-source="{{ art.source }}"
+           data-author="{{ art.author | default('') }}"
+           data-published="{{ art.published | default('') }}"
+           data-summary="{{ art.summary | default('') }}"
+           data-image="{{ art.image_url | default('') }}"
+           data-topic="{{ art.topic | default('Other') }}"
+           data-score="{{ art.score | default(3) }}"
+           data-url="{{ art.url }}">
+        <a class="title" href="{{ art.url }}">{{ art.title }}</a>
+        <div class="badges">
+          <span class="score-badge">{{ art.score | default("?") }}/5</span>
+          <span class="source-name">{{ art.source }}</span>
+          {% if art.author %}<span class="source-name">&mdash; {{ art.author }}</span>{% endif %}
+        </div>
+        {% if art.published %}
+        <div class="article-date">{{ art.published }}</div>
+        {% endif %}
+        {% if art.rationale %}
+        <div class="rationale">{{ art.rationale }}</div>
+        {% endif %}
+        <button class="share-btn" onclick="openStoryModal({{ article_index.n }})">IG Story</button>
+      </div>
+      {% set article_index.n = article_index.n + 1 %}
+      {% endfor %}
+      {% else %}
       <div class="no-articles">No articles found</div>
-      
-      
-      <div class="section-title">Ham Radio</div>
-      
-      
-      <div class="article score-5">
-        <a class="title" href="https://news.google.com/rss/articles/CBMif0FVX3lxTFBmaXB2MkdGaFNOZVNpQURSbmtBU01mSkJKRkRMLVdHN2E2c0szOEZ2bTl5Z3Q0bTU0M2dPell0MTc5dG1Ja2JiSDY5a2t4eVpETG0wU0Voc0xUYkxHdUtvYnMxdDhSTFpRNzhURXNHeEZrNGxpUUFzeWhkZlZqdFU?oc=5">10 M Ham Radio Antenna Dipole Antenna For 10M, 20M, &amp; 40M Ham Radio - Fleetwood Digital Full Wave Dipole - hotelier.com.py</a>
-        <div class="badges">
-          <span class="score-badge">5/5</span>
-          <span class="source-name">Google News - Ham Radio</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 04:17 AM</div>
-        
-        
-        <div class="rationale">Directly about ham radio antennas and equipment for ham radio operators.</div>
-        
-      </div>
-      
-      <div class="article score-5">
-        <a class="title" href="https://news.google.com/rss/articles/CBMikwFBVV95cUxOU2VJZ1dsZk1Gelctcl9hbXpBNE15OUUyQWJkOXpsTlZSdkp0YWdRclhPWUc1QndNRURZRTI0OXo2b3JLRVc4QzF4TjNpV1JhSU1XV2NJRkMwS0lBekJxel9tVktvSEJ0bVhXNWtsd0VFMEJUTlNLZEVKRXpyTUdGYXVmcFN6WUdoSEp5MFhfYlc1cGM?oc=5">AM FM Radio Kit Parts CF210SP Suite For Ham Electronic Lover Assemble DIY Electr - hotelier.com.py</a>
-        <div class="badges">
-          <span class="score-badge">5/5</span>
-          <span class="source-name">Google News - Ham Radio</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 05:22 AM</div>
-        
-        
-        <div class="rationale">Directly about ham radio DIY electronics and assembly kits for ham radio enthusiasts.</div>
-        
-      </div>
-      
-      
-      
-      <div class="section-title">GMRS</div>
-      
-      <div class="no-articles">No articles found</div>
-      
-      
-      <div class="section-title">Emergency Comms</div>
-      
-      
-      <div class="article score-3">
-        <a class="title" href="https://news.google.com/rss/articles/CBMi3wFBVV95cUxQQl9tZEJjVUJ5QloxeURpX25NNTF5S0g3UjZVMEJVeS1lS19RQTNPc0ZQTzRZcERnNXpRZlYzTmdVWlJlb1VXUFdYeHBHLUlQQ0w4SW1DLU11aENGQXpNZXlJdE5kRC1PMWlKXzlva2xjQ2JJbTVyMXdxLXc3eTdMTU5KTy1aaHllMUxpNGxwTFhDQkM0ZmMwbWZYb3BKV2VkYnc3Sy0xRXdoZV9NWHMydmtPX296TVJPcm1UNzlkQ0UxUDJISllUX25tUHdUZEZEMm9JYV95VksxZE9CMDg4?oc=5">Red River Parish breaks ground on new emergency operations center - KTBS</a>
-        <div class="badges">
-          <span class="score-badge">3/5</span>
-          <span class="source-name">Google News - Emergency Comms</span>
-        </div>
-        
-        <div class="article-date">Mar 21, 09:15 PM</div>
-        
-        
-        <div class="rationale">Infrastructure development for emergency operations is moderately relevant to RME&#39;s audience interested in emergency communications systems, though it lacks specific details about radio systems or communications technology.</div>
-        
-      </div>
-      
-      
-      
-      <div class="section-title">Outages &amp; Infrastructure</div>
-      
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMitgFBVV95cUxOMGFWd0Myb1Z4VW1SdXZDTlRuYVR3eVB1UGhqTnhkblBiN0xNLWo2Y2F5c3dGVk9aZnRmZmxPbGtJSlhGS1NMZkNXNm9tZUUxRkt6S0RhVUJtSmxod2xlc194bExRRmtjR19jRVdHZnJTT2Z0elF4MkhNZ0E3OWZPeWxVSHMybHRRNUtETDdCVmtCUERJSFpqaHFDRjJjWVZoNEtPam9TQ2ZEanlmQWt5RmUzOFJBdw?oc=5">Cuba Suffers Third Complete Power Grid Failure This Month - Fine Day 102.3</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 01:45 AM</div>
-        
-        
-        <div class="rationale">Power grid failure directly relevant to RME&#39;s audience interested in off-grid preparedness and emergency communications.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMi8AFBVV95cUxQMTM5bEtFTkZlVnB5QWxLSlhtaTNkbWpSbFdKdHY2blpfTVAyaU9EaVFlMUNFd25QaVlXckQ2S3BSSGUzQkdwVXJFbHd1cUJsUUJXTXhYVFFNdlNURTlUQ2pDNVV2LWZqam05MFRBNTNYbG55RDg2OXJxVWFPR0V2OS1mRzdpQkhDdWFCZVVCLWZNOE12SjNlR19GVVpFVWdzWUZ0cFJ6VGxranF1T0pyUTVOZ19XU1VJQWliTlUwUEV1dzNZUjlLb1prQmZTWExkcHBXdUxYWG9xWWZweEc4OG10RzlrbEU1X3VQMVQ5OUvSAfYBQVVfeXFMT2djaE9Kbi1KRjRkODNnWjNLdGFvckpCcnNmRXFhR19ITm5adHRMbldCVEtCWThQWWtTT185Q3JoWVRvMmE1OXRBQ3VwLWs3T0FPa2FKOGJvVkNLams5TkRGb0ZSdTZGSjZ4Y3BmbTdCMDJlYTcwVGk5QUVoSmtpNEFZSl9zSDVsYk9lNmtPTTRhQzlsdUc1UlJrZkZiQy1VMDA0U2w4alNURExqZHY1YURNazNLTExmbWtSVTFrTzcwQ01lWjFiWWpkQXdzdFpoRE9qb0UyMXQwUFM2RzZRa0pIU19LdEhnanluVWs0LTRTUjF2V0Nn?oc=5">Residents report interruptions in electricity and water supply on left bank of Kyiv due to power grid failure - Ukrinform</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 21, 09:19 PM</div>
-        
-        
-        <div class="rationale">Power grid failure affecting essential services, relevant to RME&#39;s preparedness and emergency communications focus.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMixgFBVV95cUxQZEVGaTlMSE5naW1ZbHRpUWhPNmJ1VFJMVkt3N2lQMGp4cUswRlBiUWdEbjNzYk1LTlBtZnU5VjlVaHZRaWlJWVZQcGc0cmhTdkplbF9wb2tYT1NjQTVOZU9LSjkydmFhZzdTZ0tUNHVDdTJ4Q2xKd21maUtqdE1qZGFOcDl4Mk5wOUxmYkE1N2lIMUxPblU3LUEzVkZmUUNVa1BlVTZXYVlQaGYyb2ZucHF0ekVfMFhNcl9kTjZMbHBWVjNNQlE?oc=5">Washington’s oil blockade triggers second total collapse of Cuban power grid - Investing.com</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 02:33 AM</div>
-        
-        
-        <div class="rationale">Major power grid collapse demonstrates critical infrastructure failure and the importance of emergency communications preparedness for RME&#39;s audience.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMinAFBVV95cUxNS0cwWUN3YldNazhYaE1aZVh5NUJ6cHgwejVTT3dGTXZRazAzX2hOUUNTbUprWUZzYjRGQ0M2UUZ6UUV0VGJ2UEJTS19pbmJxLVFFdmRObnR0RWx3MF9zY2oxeWVtUEpaU3NBd2w4Ymp5R29fNXlJczVrQ1pYU0tyNlNPYTh0bjJpci05UklwUEZycG9URER6ajVfTUk?oc=5">Cuba reports 2nd nationwide power grid collapse this week - bnonews.com</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 21, 11:47 PM</div>
-        
-        
-        <div class="rationale">Nationwide power grid collapse is directly relevant to RME&#39;s emergency communications and off-grid preparedness audience.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMimgFBVV95cUxQSWZKXzU5VUJVM0ozUTl2T2xpOFNxc2xsb2ZGMS1kZnN0LW9sTW04bHZKTzE0Z0ZmZzNTdzNfVktvNTBMbDU0RUs2R201emlNV3drTlRwRnpPcEFGQ0ZfUEg3VzJWem1WSlJNSGd2NEtLWU5hNU5Jd1AtcjFCang2VDBvay1kbXFiMUJqd19lU0hRN2FWYkgyb0hn?oc=5">Cuba Hit By Second Nationwide Blackout In A Week As Power Grid Collapses - Arise News</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 08:55 AM</div>
-        
-        
-        <div class="rationale">Significant power infrastructure failure exemplifies scenarios where ham radio and emergency communications become essential.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMimgFBVV95cUxQNU9rSC02cmxlanBzTFl6N2pJNk4wZGVYU2xZWUVXQkM5dTVERjhDbVA2MlJjandkbk4xb2Z1M2s5cUFkU3NFWUpBQ3BWMklCYlMwdDlkMlFfTUhZYlBMN3N1eGZJVkRUbFYwNkxyM1J3QTY1X1doZGo2bHVoT2JGTU56aG1mVloyblRFdkJhN2JiUHAtX0NtTjJB?oc=5">Cuba Plunges into Darkness Again Following Second Nationwide Power Grid Failure in a Week - Ratopati</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 05:28 AM</div>
-        
-        
-        <div class="rationale">Major power grid failure demonstrates real-world emergency scenarios where RME&#39;s communications solutions would be critical.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE1oR2tSLW03TlRySnZib1lZUDR6bmQ2dVpDYTZSOF9qMmVlN3VjUnFwb1NrQ1NXSjItY1RuWnVOTGpBTTdfeHZQWDVCRDZnVlAyMmNHb3dkWFFhdw?oc=5">Energy crews work to restore power after grid failure on Kyiv left bank - mezha.net</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 21, 09:07 PM</div>
-        
-        
-        <div class="rationale">Power grid failure in Kyiv is relevant to RME&#39;s infrastructure resilience and emergency communications focus.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMiswFBVV95cUxQb21OdFktQVdKdEV2VmRnWjcxZURlYTAtbTdIWkNiYm1TczZfUjVpYjNWbGYxRWdCNUJtNllpeFFpdVdnTjZFdC1nRXU4ODNyRVpndjYxaFdIdmxwRE1fRUF4Q3JQNXhmM2FqcF82c2hfOGpieWVCSm9HRHIyRmZTaTNKYmFqdG00UDhjWVpjOEtiS3hGaUx1R1JreldwdG9fcmhzaVlMbHJTY2JpNjdmTEtQc9IBuAFBVV95cUxPaHY5MlBHYUNwZDg5TEtUaWxlX0oxdkJ1LURNV25oQmd0M0ZubmNMeHJBVlRmS1FSLTNhYTktUkhjSll1RmphajJ6NTV0T3NFdEhEd1NOZ2dtM1E1aHN3NmxObG8yaWppTDNiMjdVRWI3Nm5Qa3pidDBGY3dTRm1kUnVCblM1c1JWYzV5TnNKN2tJMVd3SWhyT2NRcnYyVVVyaGpQRWpUSTlEN3JobDRUS25rUUtYbG9r?oc=5">Cuba plunged into darkness again as power grid collapses - Moneycontrol.com</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 09:53 AM</div>
-        
-        
-        <div class="rationale">Widespread power outage highlights the need for alternative communications systems that RME specializes in.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMiowFBVV95cUxPcV9ORzE4ZFFLSGZEWUtFSHhON2tKekJta1h5bmxpRzR6TUlzQmNpM2VPQ2pyeGtOM2VxWGFaWWpmblVHUG16Y2RKS2dnUlpaXzQ0U1NrWmNVOGZJNzUtcXlsVDdmRlpQN1ktanFPUWZkXy10b1lTLUNreGRaUTc0T0JjYm5vakpmVHdfdjZEUHVfd1JRQmpiRVoyUUt5TUYzOGJ30gGoAUFVX3lxTE1BM20xZmM0WGF6RE84Qkt2dWt4M0lBazlmYmIxakM3UWRsY3kyeUI1eG1zeHFSQ05lUDc2YWdwSURZY083NXBjNlI2OVRVOTBQMHpOMllGa3Jjd0FtRHhXUDNfTFRZNnZrM2VQNFEzd3hnWnhNWWF3UmtPTjRYSVBMel9iX3l6NXFsQlVmbzFKdlNLaHpfYUR2TnRHajBjQWNpUUdQZUgtZw?oc=5">Cuba&#39;s Power Grid Crisis: A Triple Blackout Blow - Devdiscourse</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 06:33 AM</div>
-        
-        
-        <div class="rationale">Multiple power grid failures demonstrate infrastructure vulnerability and justify RME&#39;s preparedness and off-grid solutions.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxOT3U2d3Y4TXR2UmMteE1pZHYyV2VYSEUzbjhMbDh0UXhnczdZQ1RJTmRHU3BRWjNaZ3M4REZ4cVRZemlia21SVk5sajJQeWdoSS1zOHpVUUZCUEt6Si0yNXp4amdUS0FUNXQ2STFpRlBBQXJrMGlXWHpOX0Q0dnl2WDl1cXRiVF9hc0FsS05wX05yUm1pODBQZlBKZ01wWXFzN0ZaSGhaa1jSAacBQVVfeXFMTjRjLXJEMlZHYzZmdzNDaUw5c3BOekNjZHo2THlNZFhNNUxRd3JfWGlGaWtMVnFsSVlielp6U0g5UXVRQ1pBUXFTeUZsdFl0SHFYaFF5eUpGemZKMTJnV1RkbGx2UG5VcG9LdGpWN3hhMDRZLV9TTmdKRmEybzlDQ2J5TmJVMXpiR25wLUtXb3NJdzJQaFpVdTBjb21oQ3ZRVGVieUZ5SUU?oc=5">Kyiv experiences power and water supply disruptions due to power grid failure - KMDA - Українські Національні Новини (УНН)</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 21, 08:58 PM</div>
-        
-        
-        <div class="rationale">Power and water supply disruptions are critical infrastructure failures relevant to emergency preparedness and alternative communications.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMiygFBVV95cUxNOWQwejQ3b0pKR1JBR1JzYUc3Ui1HLUxoemhCckNlMGY4NlV5WU9lNGp6V3ZxSTRpSWk4UWZtSlRqSjhraVBpc1phbDdxUjhsLXZYYTd6eEZLYlNDVGVJN0F0bVJFcVA4RTFXUUk2aTcwZTlCTkVzSE5pei1HMUFXRUlWUXFpWl90eTdTUzBTclJQNGZuV3I4eTZXbGtTWDNscE9UVkRpYU40S25pYVAzS010X1J5aTloWEpKUF81MlVLaHNQRWlnRmhB?oc=5">Cuba Plunges Into Darkness as Power Grid Fails for Second Time This Week - Fine Day 102.3</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 12:30 AM</div>
-        
-        
-        <div class="rationale">Repeated power grid failure showcases infrastructure weakness and the necessity for emergency communication systems.</div>
-        
-      </div>
-      
-      <div class="article score-4">
-        <a class="title" href="https://news.google.com/rss/articles/CBMilgFBVV95cUxPVklvZjVKNXVmbUdPdnpMX2dmUnpMMzFRT0JZYm5BX2NlMmxXU2lGS3BKS0ZHcURGbFRUdXRNNER0YWkzQWdmNjJ4WDY3dWh5RkZfTGptV0pXQjF1TThaOEUtM3JFbDlGRUd5T21aMTBKVVZtUm1aNElHSWU4R3Y2dERUUGNyYXJseFBGdTEtVFA2dXNMQmc?oc=5">Amid US blockade: Cuba hit by second nationwide blackout in a week - RTL Today</a>
-        <div class="badges">
-          <span class="score-badge">4/5</span>
-          <span class="source-name">Google News - Power Grid</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 02:59 AM</div>
-        
-        
-        <div class="rationale">Nationwide blackout exemplifies infrastructure collapse scenarios where RME&#39;s emergency communications solutions are essential.</div>
-        
-      </div>
-      
-      <div class="article score-3">
-        <a class="title" href="https://news.google.com/rss/articles/CBMikwFBVV95cUxQV21OcGZKQzVmMW9oQXlsS0FMV2p4ejROOEltOF95bWVxc3Y0WmY4RXJaWk1vNGcyTWRWdmN1YWg5Y0RBVDA4aDYxVklTcHpYbE5RbFlRd1JNT1o4TzJZcC13alpST21udlpIZlJBcHR1SlpMcVUyMlpQeDJBb1lQLUFvM2lLZUtBbXJQejBEQnlfRW_SAZgBQVVfeXFMUE4wcEM3aWZYY0xzdGY4c1d0clFfSlFFakh6aDJlZVpOWXdyZXI2dW1GaEFpLVNMdThCZHhFaXRzdFR4X1M1Qk5hc280VWtRQ0JteDBXTkVRLVJNLTFTQjRKQTVsalRJNm5PNE94bmMtLUNnWndfSkY2VHc0aGdpTTFKYkcwOU5Yalc0MVNCVjFXSUNlRGtDeW8?oc=5">Iran faces near-total internet outage for more than 500 hours - Report.az</a>
-        <div class="badges">
-          <span class="score-badge">3/5</span>
-          <span class="source-name">Google News - Internet Outage</span>
-        </div>
-        
-        <div class="article-date">Mar 22, 11:08 AM</div>
-        
-        
-        <div class="rationale">Internet outage demonstrates need for alternative communications like ham radio and GMRS for emergency situations.</div>
-        
-      </div>
-      
-      
-      
-      <div class="section-title">Preparedness &amp; Off-Grid</div>
-      
-      <div class="no-articles">No articles found</div>
-      
-      
-      <div class="section-title">FCC &amp; Policy</div>
-      
-      <div class="no-articles">No articles found</div>
-      
-      
-      <div class="section-title">FCC Enforcement</div>
-      
-      <div class="no-articles">No articles found</div>
-      
-      
-      <div class="section-title">Other</div>
-      
-      <div class="no-articles">No articles found</div>
-      
-      
+      {% endif %}
+      {% endfor %}
     </div>
     <div class="footer">
       <a href="index.html">View All Reports</a><br>

@@ -4,35 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RME News Scout -- Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --rme-accent: #fdd351;
+      --rme-accent-hover: #ffe066;
+      --rme-bg: #0a0a0a;
+      --rme-bg-card: #141414;
+      --rme-bg-elevated: #1c1c1c;
+      --rme-text: #e8e8e8;
+      --rme-text-secondary: #a0a0a0;
+      --rme-text-heading: #fdd351;
+      --rme-border: #2a2a2a;
+      --rme-border-accent: rgba(253, 211, 81, 0.22);
+      --rme-radius: 10px;
+      --rme-font-heading: 'Barlow Semi Condensed', 'Barlow', sans-serif;
+      --rme-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f4f4f7;
-      color: #333;
+      font-family: var(--rme-font-body);
+      background: var(--rme-bg);
+      color: var(--rme-text);
       margin: 0;
       padding: 0;
     }
     .container {
       max-width: 640px;
       margin: 20px auto;
-      background: #fff;
-      border-radius: 8px;
+      background: var(--rme-bg-card);
+      border-radius: var(--rme-radius);
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      border: 1px solid var(--rme-border);
     }
     .header {
-      background: #1a3a5c;
-      color: #fff;
+      background: var(--rme-bg-elevated);
       padding: 24px 28px;
+      border-bottom: 1px solid var(--rme-border);
     }
     .header h1 {
       margin: 0 0 4px 0;
-      font-size: 22px;
+      font-family: var(--rme-font-heading);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--rme-text-heading);
+      letter-spacing: 0.5px;
     }
     .header p {
       margin: 0;
       font-size: 14px;
-      opacity: 0.85;
+      color: var(--rme-text-secondary);
     }
     .body {
       padding: 20px 28px;
@@ -44,53 +67,59 @@
     }
     .report-item {
       padding: 14px 16px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--rme-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: background 0.15s;
     }
     .report-item:last-child {
       border-bottom: none;
     }
     .report-item:hover {
-      background: #f8f9fa;
+      background: var(--rme-bg-elevated);
     }
     .report-item a {
-      color: #1a3a5c;
+      color: var(--rme-text-heading);
       text-decoration: none;
+      font-family: var(--rme-font-heading);
       font-weight: 600;
-      font-size: 15px;
+      font-size: 16px;
     }
     .report-item a:hover {
+      color: var(--rme-accent-hover);
       text-decoration: underline;
     }
     .report-meta {
       font-size: 12px;
-      color: #999;
+      color: var(--rme-text-secondary);
     }
     .today-badge {
       display: inline-block;
       font-size: 10px;
       font-weight: 700;
-      color: #fff;
-      background: #2ecc71;
+      color: var(--rme-bg);
+      background: var(--rme-accent);
       border-radius: 3px;
-      padding: 2px 6px;
+      padding: 2px 8px;
       margin-left: 8px;
       vertical-align: middle;
+      font-family: var(--rme-font-heading);
+      letter-spacing: 0.5px;
     }
     .empty {
       text-align: center;
       padding: 40px 20px;
-      color: #999;
+      color: var(--rme-text-secondary);
       font-style: italic;
     }
     .footer {
-      background: #f4f4f7;
+      background: var(--rme-bg-elevated);
       text-align: center;
-      padding: 16px;
+      padding: 18px;
       font-size: 12px;
-      color: #999;
+      color: var(--rme-text-secondary);
+      border-top: 1px solid var(--rme-border);
     }
   </style>
 </head>
