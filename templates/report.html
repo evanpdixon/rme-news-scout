@@ -290,7 +290,7 @@
            data-source="{{ art.site_name | default(art.source) }}"
            data-author="{{ art.author | default('') }}"
            data-published="{{ art.published | default('') }}"
-           data-summary="{{ art.og_description or art.summary or '' }}"
+           data-summary="{{ art.abstract or art.og_description or art.summary or '' }}"
            data-image="{{ art.image_url | default('') }}"
            data-favicon="{{ art.favicon_url | default('') }}"
            data-topic="{{ art.topic | default('Other') }}"
