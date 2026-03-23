@@ -447,6 +447,24 @@
       } catch(e) { return ''; }
     }
 
+    // Measure how many lines wrapText would need (without drawing)
+    function measureWrap(ctx, text, maxWidth, font) {
+      ctx.font = font;
+      const words = text.split(' ');
+      let line = '';
+      let lines = 1;
+      for (let i = 0; i < words.length; i++) {
+        const test = line + words[i] + ' ';
+        if (ctx.measureText(test).width > maxWidth && i > 0) {
+          lines++;
+          line = words[i] + ' ';
+        } else {
+          line = test;
+        }
+      }
+      return lines;
+    }
+
     async function renderStoryCard(data) {
       const canvas = document.getElementById('storyCanvas');
       canvas.width = STORY_W;
@@ -455,6 +473,7 @@
       const pad = 64;
       const contentW = STORY_W - pad * 2;
       const stickerZone = LINK_STICKER_ZONE;
+      const bottomLimit = STORY_H - stickerZone;
 
       // Load images via CORS proxy
       const [featuredImg, faviconImg] = await Promise.all([
@@ -463,104 +482,121 @@
       ]);
 
       const hasImage = !!featuredImg;
-
-      // ── LAYOUT: Image takes top ~45%, text fills bottom ~55% ──
-      // Without image: text is centered vertically with larger fonts
-      const imgH = hasImage ? Math.round(STORY_H * 0.44) : 0; // ~845px
+      const summaryText = data.summary || '';
 
       // ── Background ──
       ctx.fillStyle = '#121212';
       ctx.fillRect(0, 0, STORY_W, STORY_H);
 
-      // ── Featured image (full bleed, cover-fit) ──
+      // ── Featured image (top portion, full bleed) ──
+      const imgH = hasImage ? Math.round(STORY_H * 0.44) : 0;
       if (hasImage) {
         const scale = Math.max(STORY_W / featuredImg.width, imgH / featuredImg.height);
         const sw = STORY_W / scale;
         const sh = imgH / scale;
-        const sx = (featuredImg.width - sw) / 2;
-        const sy = (featuredImg.height - sh) / 2;
-        ctx.drawImage(featuredImg, sx, sy, sw, sh, 0, 0, STORY_W, imgH);
-
-        // Bottom fade into dark
-        const grad = ctx.createLinearGradient(0, imgH - 200, 0, imgH);
+        ctx.drawImage(featuredImg, (featuredImg.width - sw) / 2, (featuredImg.height - sh) / 2, sw, sh, 0, 0, STORY_W, imgH);
+        // Bottom gradient fade
+        const grad = ctx.createLinearGradient(0, imgH - 220, 0, imgH);
         grad.addColorStop(0, 'rgba(18,18,18,0)');
         grad.addColorStop(1, 'rgba(18,18,18,1)');
         ctx.fillStyle = grad;
-        ctx.fillRect(0, imgH - 200, STORY_W, 200);
-
-        // Top scrim for source bar readability
-        const topGrad = ctx.createLinearGradient(0, 0, 0, 140);
-        topGrad.addColorStop(0, 'rgba(0,0,0,0.55)');
-        topGrad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = topGrad;
+        ctx.fillRect(0, imgH - 220, STORY_W, 220);
+        // Top scrim
+        const topG = ctx.createLinearGradient(0, 0, 0, 140);
+        topG.addColorStop(0, 'rgba(0,0,0,0.6)');
+        topG.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = topG;
         ctx.fillRect(0, 0, STORY_W, 140);
       }
 
-      // ── Source bar (favicon + name + date) — always at top ──
-      const iconSize = 48;
-      const sourceBarY = 56;
+      // ── Source bar at top ──
+      const iconSize = 52;
+      const barY = 56;
       if (faviconImg) {
         ctx.save();
-        drawRoundedRect(ctx, pad, sourceBarY, iconSize, iconSize, 8);
+        drawRoundedRect(ctx, pad, barY, iconSize, iconSize, 10);
         ctx.clip();
-        ctx.drawImage(faviconImg, pad, sourceBarY, iconSize, iconSize);
+        ctx.drawImage(faviconImg, pad, barY, iconSize, iconSize);
         ctx.restore();
       }
-
-      const textX = faviconImg ? pad + iconSize + 16 : pad;
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '700 32px ' + FONT;
-      ctx.fillText(data.source, textX, sourceBarY + 22);
-
-      // Date / author below source name
+      const srcX = faviconImg ? pad + iconSize + 16 : pad;
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 34px ' + FONT;
+      ctx.fillText(data.source, srcX, barY + 24);
       if (data.author || data.published) {
-        ctx.fillStyle = 'rgba(255,255,255,0.55)';
-        ctx.font = '400 24px ' + FONT;
-        let meta = '';
-        if (data.published) meta += data.published;
-        if (data.author && data.published) meta += '  \u00B7  ';
-        if (data.author) meta += data.author;
-        ctx.fillText(meta, textX, sourceBarY + 48);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '400 26px ' + FONT;
+        let m = '';
+        if (data.published) m += data.published;
+        if (data.author && data.published) m += '  \u00B7  ';
+        if (data.author) m += data.author;
+        ctx.fillText(m, srcX, barY + 54);
       }
 
-      // ── Text zone starts after image or after source bar ──
-      let curY = hasImage ? imgH + 20 : sourceBarY + iconSize + 60;
-      const bottomLimit = STORY_H - stickerZone - 20;
-      const textZoneH = bottomLimit - curY;
+      // ── Calculate text zone ──
+      const textTop = hasImage ? imgH + 16 : barY + iconSize + 50;
+      const textAvailable = bottomLimit - textTop;
 
-      // ── Gold accent bar ──
-      ctx.fillStyle = '#fdd351';
-      ctx.fillRect(pad, curY, 56, 5);
-      curY += 32;
+      // ── Measure content to choose font sizes ──
+      // Headline: try sizes from large to small until it fits well
+      const titleText = data.title || '';
+      let hSize, hLead, hLines;
 
-      // ── Headline ──
-      // Size adapts: larger when no image (more vertical space)
-      const headlineSize = hasImage ? 54 : 62;
-      const headlineLeading = hasImage ? 66 : 76;
-      const headlineMaxLines = hasImage ? 4 : 5;
+      // Without image we have ~1700px of text space. With image ~1000px.
+      // Pick headline size based on title length and available space
+      const targetHeadlineRatio = summaryText.length > 20 ? 0.35 : 0.55; // headline gets 35-55% of space
+      const headlineTarget = textAvailable * targetHeadlineRatio;
+
+      // Try decreasing font sizes
+      for (hSize = hasImage ? 56 : 72; hSize >= 40; hSize -= 4) {
+        hLead = Math.round(hSize * 1.22);
+        const testFont = 'bold ' + hSize + 'px ' + FONT;
+        hLines = measureWrap(ctx, titleText, contentW, testFont);
+        const headH = hLines * hLead;
+        if (headH <= headlineTarget || hSize <= 40) break;
+      }
+
+      // Summary font size: fill remaining space
+      let sSize, sLead;
+      const headlineH = hLines * hLead + 60; // headline + padding + divider
+      const summaryAvailable = textAvailable - headlineH;
+
+      if (summaryText.length > 20) {
+        // Try increasing font size until summary fills the space
+        for (sSize = 28; sSize <= 52; sSize += 2) {
+          sLead = Math.round(sSize * 1.52);
+          const testFont = '400 ' + sSize + 'px ' + FONT;
+          const sLines = measureWrap(ctx, summaryText, contentW, testFont);
+          const sumH = sLines * sLead;
+          if (sumH >= summaryAvailable * 0.7 || sSize >= 52) break;
+        }
+      } else {
+        sSize = 36;
+        sLead = 54;
+      }
+
+      // ── Draw headline ──
+      let curY = textTop;
+
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold ' + headlineSize + 'px ' + FONT;
-      curY = wrapText(ctx, data.title, pad, curY, contentW, headlineLeading, headlineMaxLines);
+      ctx.font = 'bold ' + hSize + 'px ' + FONT;
+      curY = wrapText(ctx, titleText, pad, curY, contentW, hLead, 8);
       curY += 24;
 
-      // ── Thin divider ──
+      // ── Divider ──
       ctx.fillStyle = 'rgba(255,255,255,0.1)';
-      ctx.fillRect(pad, curY, contentW, 1);
-      curY += 28;
+      ctx.fillRect(pad, curY, contentW, 2);
+      curY += 32;
 
-      // ── Abstract / summary — fill remaining space ──
-      const summaryText = data.summary || '';
+      // ── Summary / abstract ──
       if (summaryText.length > 5) {
-        const summarySize = hasImage ? 32 : 36;
-        const summaryLeading = hasImage ? 48 : 54;
         ctx.fillStyle = 'rgba(255,255,255,0.82)';
-        ctx.font = '400 ' + summarySize + 'px ' + FONT;
-        const remainingH = bottomLimit - curY;
-        const maxLines = Math.max(Math.floor(remainingH / summaryLeading), 3);
-        curY = wrapText(ctx, summaryText, pad, curY, contentW, summaryLeading, maxLines);
+        ctx.font = '400 ' + sSize + 'px ' + FONT;
+        const maxSumLines = Math.max(Math.floor((bottomLimit - curY) / sLead), 2);
+        curY = wrapText(ctx, summaryText, pad, curY, contentW, sLead, maxSumLines);
       }
 
-      // Bottom stickerZone px intentionally empty for IG link sticker
+      // Bottom stickerZone px reserved for IG link sticker
     }
   </script>
 </body>

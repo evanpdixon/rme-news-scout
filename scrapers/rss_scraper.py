@@ -91,16 +91,14 @@ def scrape_rss_feeds(feeds: list[dict]) -> list[dict]:
             elif hasattr(entry, "authors") and entry.authors:
                 author = entry.authors[0].get("name", "")
 
-            # For Google News feeds, the <source> tag has the real article URL
-            # and publisher name (e.g. source.href = "https://apnews.com/...",
-            # source.title = "AP News")
+            # For Google News feeds, the <source> tag has the publisher name
+            # (source.href is just the homepage, NOT the article URL)
+            # Keep the Google News link — metadata.py will skip it for enrichment
+            # but it's still needed for dedup and linking
             article_url = entry.get("link", "")
             site_name = ""
             source_entry = entry.get("source", {})
             if source_entry:
-                real_url = source_entry.get("href", "")
-                if real_url:
-                    article_url = real_url
                 publisher = source_entry.get("title", "")
                 if publisher:
                     site_name = publisher
