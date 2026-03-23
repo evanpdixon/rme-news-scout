@@ -12,7 +12,7 @@ from datetime import datetime
 from scrapers import run_all_scrapers
 from dedup import load_seen_urls, save_seen_urls, deduplicate
 from scorer import score_articles, filter_by_score
-from digest import generate_markdown, generate_html_report
+from digest import generate_markdown, generate_html_report, generate_index
 from notifier import send_notification
 
 
@@ -90,7 +90,7 @@ def main():
 
     # 9. Send push notification via ntfy with link to hosted report
     ntfy_cfg = config.get("ntfy")
-    if ntfy_cfg and ntfy_cfg.get("topic"):
+    if ntfy_cfg and ntfy_cfg.get("enabled", True) and ntfy_cfg.get("topic"):
         top_articles = sorted(filtered, key=lambda a: a.get("score", 0), reverse=True)[:5]
         body_lines = [f"{len(filtered)} articles in today's digest:\n"]
         for art in top_articles:

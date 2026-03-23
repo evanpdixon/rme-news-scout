@@ -44,7 +44,7 @@ jobs:
             exit 0
           fi
 
-          cp output/*.html /tmp/
+          cp output/*_digest.html /tmp/
 
           # Switch to gh-pages branch
           if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
@@ -55,14 +55,54 @@ jobs:
             git rm -rf .
           fi
 
-          # Copy reports
-          cp /tmp/*.html .
+          # Copy today's report(s)
+          cp /tmp/*_digest.html .
 
           # latest.html always points to the newest report
           LATEST=$(ls -t *_digest.html 2>/dev/null | head -1)
           if [ -n "$LATEST" ]; then
             cp "$LATEST" latest.html
           fi
+
+          # Generate index page listing all historical reports
+          python -c "
+          import glob, re, os
+          from datetime import date, datetime
+          from jinja2 import Environment, FileSystemLoader
+
+          today_iso = date.today().isoformat()
+          files = glob.glob('*_digest.html')
+          reports = []
+          for fname in files:
+              match = re.match(r'(\d{4}-\d{2}-\d{2})_digest\.html', fname)
+              if match:
+                  date_str = match.group(1)
+                  try:
+                      dt = datetime.strptime(date_str, '%Y-%m-%d')
+                      display_date = dt.strftime('%B %d, %Y')
+                  except ValueError:
+                      display_date = date_str
+                  reports.append({
+                      'filename': fname,
+                      'date_str': date_str,
+                      'display_date': display_date,
+                      'is_today': date_str == today_iso,
+                  })
+          reports.sort(key=lambda r: r['date_str'], reverse=True)
+
+          # Checkout just the template from main branch
+          os.system('git checkout origin/master -- templates/index.html 2>/dev/null || git checkout origin/main -- templates/index.html 2>/dev/null')
+          env = Environment(loader=FileSystemLoader('templates'), autoescape=True)
+          template = env.get_template('index.html')
+          html = template.render(reports=reports)
+          with open('index.html', 'w') as f:
+              f.write(html)
+          # Clean up template dir from gh-pages
+          import shutil
+          if os.path.isdir('templates'):
+              shutil.rmtree('templates')
+          print(f'  Index page generated with {len(reports)} reports')
+          "
 
           git add *.html
           git diff --cached --quiet || git commit -m "Update digest $(date +%Y-%m-%d)"
