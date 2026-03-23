@@ -667,33 +667,16 @@
   </div>
 
   <script>
-    // ── RME Brand Constants ──
-    const GOLD = '#fdd351';
-    const GOLD_DIM = 'rgba(253, 211, 81, 0.15)';
-    const BG_DARK = '#0a0a0a';
-    const BG_CARD = '#141414';
-    const BG_ELEVATED = '#1c1c1c';
-    const TEXT_PRIMARY = '#e8e8e8';
-    const TEXT_SECONDARY = '#a0a0a0';
-    const BORDER_COLOR = '#2a2a2a';
-    const FONT_HEADING = '"Barlow Semi Condensed", "Barlow", sans-serif';
-    const FONT_BODY = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-
-    // Instagram Story dimensions: 1080 x 1920 (9:16 portrait)
     const STORY_W = 1080;
     const STORY_H = 1920;
+    const LINK_STICKER_ZONE = 40; // Reserved at bottom for IG link sticker
+    const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     let currentArticleId = null;
-
-    // RME logo image (cached)
-    const logoImg = new Image();
-    logoImg.crossOrigin = 'anonymous';
-    logoImg.src = 'https://radiomadeeasy.com/wp-content/uploads/2022/09/RadioMadeEasy.png';
 
     function openStoryModal(idx) {
       const el = document.getElementById('article-' + idx);
       if (!el) return;
       currentArticleId = idx;
-
       const data = {
         title: el.dataset.title,
         source: el.dataset.source,
@@ -701,11 +684,9 @@
         published: el.dataset.published,
         summary: el.dataset.summary,
         image: el.dataset.image,
-        topic: el.dataset.topic,
-        score: el.dataset.score,
+        favicon: el.dataset.favicon,
         url: el.dataset.url
       };
-
       document.getElementById('storyModal').classList.add('active');
       renderStoryCard(data);
     }
@@ -719,31 +700,17 @@
       const link = document.createElement('a');
       const el = document.getElementById('article-' + currentArticleId);
       const slug = (el?.dataset.title || 'story').replace(/[^a-zA-Z0-9]+/g, '-').substring(0, 50).toLowerCase();
-      link.download = 'rme-story-' + slug + '.png';
+      link.download = 'story-' + slug + '.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
 
-    // Close modal on overlay click or Escape
     document.getElementById('storyModal').addEventListener('click', function(e) {
       if (e.target === this) closeStoryModal();
     });
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeStoryModal();
     });
-
-    // Topic badge colors (on-brand variants)
-    const TOPIC_COLORS = {
-      'RME Mention':             { bg: GOLD, fg: BG_DARK },
-      'Ham Radio':               { bg: '#4dff88', fg: BG_DARK },
-      'GMRS':                    { bg: '#2ecc71', fg: BG_DARK },
-      'Emergency Comms':         { bg: '#ff4d4d', fg: '#fff' },
-      'Outages & Infrastructure':{ bg: '#e67e22', fg: '#fff' },
-      'Preparedness & Off-Grid': { bg: '#5dade2', fg: BG_DARK },
-      'FCC & Policy':            { bg: '#bb8fce', fg: BG_DARK },
-      'FCC Enforcement':         { bg: '#f1948a', fg: BG_DARK },
-      'Other':                   { bg: '#555', fg: '#fff' }
-    };
 
     function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
       const words = text.split(' ');
@@ -756,7 +723,7 @@
         if (ctx.measureText(testLine).width > maxWidth && i > 0) {
           lineCount++;
           if (lineCount >= limit) {
-            ctx.fillText(line.trim() + '...', x, currentY);
+            ctx.fillText(line.trim() + '\u2026', x, currentY);
             return currentY + lineHeight;
           }
           ctx.fillText(line.trim(), x, currentY);
@@ -784,162 +751,129 @@
       ctx.closePath();
     }
 
-    function renderStoryCard(data) {
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        if (!src) { resolve(null); return; }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+
+    async function renderStoryCard(data) {
       const canvas = document.getElementById('storyCanvas');
       canvas.width = STORY_W;
       canvas.height = STORY_H;
       const ctx = canvas.getContext('2d');
-      const pad = 72;
+      const pad = 60;
       const contentW = STORY_W - pad * 2;
 
-      // ── Background ──
-      ctx.fillStyle = BG_DARK;
-      ctx.fillRect(0, 0, STORY_W, STORY_H);
+      // Load images in parallel
+      const [featuredImg, faviconImg] = await Promise.all([
+        loadImage(data.image),
+        loadImage(data.favicon)
+      ]);
 
-      // Subtle radial glow behind content area
-      const glow = ctx.createRadialGradient(STORY_W / 2, STORY_H * 0.35, 100, STORY_W / 2, STORY_H * 0.35, STORY_W);
-      glow.addColorStop(0, 'rgba(253, 211, 81, 0.04)');
-      glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, STORY_W, STORY_H);
+      // ── Full-bleed featured image as background ──
+      const imgZoneH = featuredImg ? 820 : 0;
 
-      let curY = pad;
+      if (featuredImg) {
+        // Draw image covering top portion
+        const scale = Math.max(STORY_W / featuredImg.width, imgZoneH / featuredImg.height);
+        const sw = STORY_W / scale;
+        const sh = imgZoneH / scale;
+        const sx = (featuredImg.width - sw) / 2;
+        const sy = (featuredImg.height - sh) / 2;
+        ctx.drawImage(featuredImg, sx, sy, sw, sh, 0, 0, STORY_W, imgZoneH);
 
-      // ── RME Logo (if loaded) ──
-      const logoSize = 56;
-      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        // Gradient overlay: transparent at top, dark at bottom for text readability
+        const grad = ctx.createLinearGradient(0, imgZoneH * 0.3, 0, imgZoneH);
+        grad.addColorStop(0, 'rgba(18, 18, 18, 0)');
+        grad.addColorStop(0.7, 'rgba(18, 18, 18, 0.6)');
+        grad.addColorStop(1, 'rgba(18, 18, 18, 1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, STORY_W, imgZoneH);
+
+        // Also darken the very top for the source bar
+        const topGrad = ctx.createLinearGradient(0, 0, 0, 120);
+        topGrad.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
+        topGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = topGrad;
+        ctx.fillRect(0, 0, STORY_W, 120);
+      } else {
+        // No image — solid dark background
+        ctx.fillStyle = '#121212';
+        ctx.fillRect(0, 0, STORY_W, STORY_H);
+      }
+
+      // Dark card area below the image
+      if (featuredImg) {
+        ctx.fillStyle = '#121212';
+        ctx.fillRect(0, imgZoneH, STORY_W, STORY_H - imgZoneH);
+      }
+
+      // ── Source bar at top (favicon + source name) ──
+      let sourceY = 52;
+      const iconSize = 36;
+      if (faviconImg) {
         ctx.save();
-        drawRoundedRect(ctx, pad, curY, logoSize, logoSize, 10);
+        drawRoundedRect(ctx, pad, sourceY - 4, iconSize, iconSize, 6);
         ctx.clip();
-        ctx.drawImage(logoImg, pad, curY, logoSize, logoSize);
+        ctx.drawImage(faviconImg, pad, sourceY - 4, iconSize, iconSize);
         ctx.restore();
       }
 
-      // ── Brand name next to logo ──
-      ctx.fillStyle = GOLD;
-      ctx.font = 'bold 34px ' + FONT_HEADING;
-      ctx.fillText('RADIO MADE EASY', pad + logoSize + 16, curY + 24);
-      ctx.fillStyle = TEXT_SECONDARY;
-      ctx.font = '22px ' + FONT_BODY;
-      ctx.fillText('News Scout', pad + logoSize + 16, curY + 50);
-      curY += logoSize + 32;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '600 28px ' + FONT;
+      const sourceX = faviconImg ? pad + iconSize + 14 : pad;
+      ctx.fillText(data.source, sourceX, sourceY + 22);
 
-      // ── Gold accent line ──
-      ctx.fillStyle = GOLD;
-      ctx.fillRect(pad, curY, 60, 4);
-      curY += 32;
-
-      // ── Topic badge ──
-      const topicColors = TOPIC_COLORS[data.topic] || TOPIC_COLORS['Other'];
-      ctx.font = 'bold 22px ' + FONT_HEADING;
-      const topicText = data.topic.toUpperCase();
-      const topicMetrics = ctx.measureText(topicText);
-      const badgeW = topicMetrics.width + 32;
-      const badgeH = 38;
-
-      drawRoundedRect(ctx, pad, curY, badgeW, badgeH, 6);
-      ctx.fillStyle = topicColors.bg;
-      ctx.fill();
-      ctx.fillStyle = topicColors.fg;
-      ctx.fillText(topicText, pad + 16, curY + 27);
-      curY += badgeH + 28;
-
-      // ── Featured image ──
-      const imageArea = 400;
-
-      function drawContent() {
-        // ── Headline (gold) ──
-        ctx.fillStyle = GOLD;
-        ctx.font = 'bold 50px ' + FONT_HEADING;
-        curY = wrapText(ctx, data.title, pad, curY, contentW, 62, 5);
-        curY += 12;
-
-        // ── Source / Author / Date (white secondary) ──
-        ctx.fillStyle = TEXT_SECONDARY;
-        ctx.font = '500 24px ' + FONT_BODY;
-        let metaLine = data.source;
-        if (data.author) metaLine += '  \u2022  ' + data.author;
-        if (data.published) metaLine += '  \u2022  ' + data.published;
-        curY = wrapText(ctx, metaLine, pad, curY, contentW, 32);
-        curY += 20;
-
-        // ── Divider line ──
-        ctx.fillStyle = BORDER_COLOR;
-        ctx.fillRect(pad, curY, contentW, 1);
-        curY += 24;
-
-        // ── Summary (light text) ──
-        if (data.summary) {
-          ctx.fillStyle = TEXT_PRIMARY;
-          ctx.font = '400 28px ' + FONT_BODY;
-          const maxLines = Math.floor((STORY_H - 200 - curY) / 40);
-          curY = wrapText(ctx, data.summary, pad, curY, contentW, 40, Math.max(maxLines, 2));
-        }
-
-        // ── Bottom bar ──
-        const barH = 100;
-        const barY = STORY_H - barH;
-        ctx.fillStyle = BG_ELEVATED;
-        ctx.fillRect(0, barY, STORY_W, barH);
-        // Gold top border on bar
-        ctx.fillStyle = GOLD;
-        ctx.fillRect(0, barY, STORY_W, 2);
-
-        // Site URL centered
-        ctx.fillStyle = GOLD;
-        ctx.font = 'bold 26px ' + FONT_HEADING;
-        ctx.textAlign = 'center';
-        ctx.fillText('radiomadeeasy.com', STORY_W / 2, barY + 42);
-        // Tagline
-        ctx.fillStyle = TEXT_SECONDARY;
-        ctx.font = '400 20px ' + FONT_BODY;
-        ctx.fillText('You need off grid comms. We make it easy.', STORY_W / 2, barY + 72);
-        ctx.textAlign = 'left';
+      // Author + date on same line or next line
+      if (data.author || data.published) {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '400 22px ' + FONT;
+        let meta = '';
+        if (data.author) meta += data.author;
+        if (data.author && data.published) meta += '  \u00B7  ';
+        if (data.published) meta += data.published;
+        ctx.fillText(meta, sourceX, sourceY + 52);
       }
 
-      // Try to load featured image
-      if (data.image) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = function() {
-          const imgW = contentW;
-          const imgH = imageArea;
-          const scale = Math.max(imgW / img.width, imgH / img.height);
-          const sw = imgW / scale;
-          const sh = imgH / scale;
-          const sx = (img.width - sw) / 2;
-          const sy = (img.height - sh) / 2;
+      // ── Headline — positioned at bottom of image zone or near top if no image ──
+      let curY = featuredImg ? imgZoneH - 40 : 160;
 
-          ctx.save();
-          drawRoundedRect(ctx, pad, curY, imgW, imgH, 10);
-          ctx.clip();
-          ctx.drawImage(img, sx, sy, sw, sh, pad, curY, imgW, imgH);
-          // Subtle dark gradient at bottom edge
-          const imgGrad = ctx.createLinearGradient(0, curY + imgH - 80, 0, curY + imgH);
-          imgGrad.addColorStop(0, 'rgba(10,10,10,0)');
-          imgGrad.addColorStop(1, 'rgba(10,10,10,0.6)');
-          ctx.fillStyle = imgGrad;
-          ctx.fillRect(pad, curY, imgW, imgH);
-          ctx.restore();
-
-          // Thin gold border around image
-          ctx.save();
-          drawRoundedRect(ctx, pad, curY, imgW, imgH, 10);
-          ctx.strokeStyle = 'rgba(253, 211, 81, 0.2)';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.restore();
-
-          curY += imgH + 28;
-          drawContent();
-        };
-        img.onerror = function() {
-          drawContent();
-        };
-        img.src = data.image;
-      } else {
-        drawContent();
+      // If we have an image, the headline overlaps the bottom of the image
+      // If no image, start from top area
+      if (!featuredImg) {
+        // Draw a subtle accent line
+        ctx.fillStyle = '#fdd351';
+        ctx.fillRect(pad, curY, 50, 4);
+        curY += 36;
       }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 52px ' + FONT;
+      curY = wrapText(ctx, data.title, pad, curY, contentW, 64, 5);
+      curY += 20;
+
+      // ── Thin divider ──
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(pad, curY, contentW, 1);
+      curY += 28;
+
+      // ── Summary / abstract ──
+      if (data.summary) {
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.font = '400 30px ' + FONT;
+        // Calculate available space (leave room for link sticker zone)
+        const bottomLimit = STORY_H - LINK_STICKER_ZONE - 20;
+        const maxLines = Math.max(Math.floor((bottomLimit - curY) / 44), 2);
+        curY = wrapText(ctx, data.summary, pad, curY, contentW, 44, maxLines);
+      }
+
+      // Bottom is intentionally empty — LINK_STICKER_ZONE (40px) reserved for IG link sticker
     }
   </script>
 </body>
