@@ -37,7 +37,7 @@ def send_notification(
             "Tags": "newspaper,radio",
         }
         if report_url:
-            headers["Actions"] = f"view, View Report, {report_url}, clear=true"
+            headers["Actions"] = f"view, View Report, {report_url}"
 
         resp = httpx.post(url, content=message, headers=headers, timeout=10)
         resp.raise_for_status()
