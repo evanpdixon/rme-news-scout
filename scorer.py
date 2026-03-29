@@ -76,8 +76,12 @@ def _call_claude_cli(prompt: str) -> str:
     env = {**os.environ}
     env.pop("CLAUDECODE", None)
 
+    # Use "-" to read prompt from stdin (avoids CLI argument truncation on Windows)
+    # Normalize Unicode to ASCII-safe text to avoid Windows cp1252 encoding errors
+    prompt_safe = prompt.encode("ascii", errors="replace").decode("ascii")
     result = subprocess.run(
-        [claude_path, "-p", prompt],
+        [claude_path, "-p", "-", "--model", "haiku", "--tools", ""],
+        input=prompt_safe,
         capture_output=True,
         text=True,
         timeout=120,
@@ -85,9 +89,12 @@ def _call_claude_cli(prompt: str) -> str:
     )
 
     if result.returncode != 0:
-        raise RuntimeError(f"Claude CLI error: {result.stderr.strip()}")
+        raise RuntimeError(f"Claude CLI error (rc={result.returncode}): stderr={result.stderr.strip()!r} stdout={result.stdout[:200]!r}")
 
-    return result.stdout.strip()
+    output = result.stdout.strip()
+    if not output:
+        raise RuntimeError(f"Claude CLI returned empty output. stderr={result.stderr[:200]!r}")
+    return output
 
 
 def _call_llm(prompt: str) -> str:
@@ -127,9 +134,15 @@ def score_articles(articles: list[dict], config: dict) -> list[dict]:
         try:
             text = _call_llm(prompt)
 
-            # Extract JSON if wrapped in markdown code blocks
+            # Extract JSON array from response (handles markdown fences, surrounding text, etc.)
+            import re
+            # Try to find a JSON array in the response
             if text.startswith("```"):
                 text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+            # Find the first [ ... ] block in the text
+            match = re.search(r"\[.*\]", text, re.DOTALL)
+            if match:
+                text = match.group(0)
 
             scores = json.loads(text)
             score_map = {s["index"]: s for s in scores}

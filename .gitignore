@@ -1,6 +1,6 @@
 # RME News Scout - never commit credentials or local data
 config.yaml
-# seen_urls.json is tracked in git for CI dedup persistence
+seen_urls.json
 output/
 __pycache__/
 *.pyc
@@ -8,3 +8,6 @@ __pycache__/
 .env
 venv/
 .venv/
+
+# Local VM scripts
+/run-news-scout.bat
