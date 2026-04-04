@@ -11,3 +11,10 @@ venv/
 
 # Local VM scripts
 /run-news-scout.bat
+
+# Standard ignores
+*.log
+*.db-shm
+*.db-wal
+*.xml
+node_modules/
