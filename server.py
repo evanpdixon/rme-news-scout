@@ -194,4 +194,4 @@ app.add_middleware(AudioInjectMiddleware)
 app.mount("/reports", StaticFiles(directory=str(OUTPUT_DIR)), name="reports")
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="100.77.39.93", port=8804)
+    uvicorn.run("server:app", host="0.0.0.0", port=8804)
